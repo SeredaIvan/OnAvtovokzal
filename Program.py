@@ -10,19 +10,19 @@ from ClassLib.timetable import Timetable
 db_context = DbContext()
 
 app = Flask(__name__)
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 buses=[Buses()]
 cities=[Cities()]
 tickets=[Tickets()]
-user=Clients()
+user=None
 timetable=[Timetable()]
-
 
 @app.route('/journeys')
 def journeys():
     buses = db_context.get_items(Buses())
 
-    return render_template("journeys.html", buses=buses ,user=user)
+    return render_template("journeys.html", buses=buses,user=user)
 
 @app.route('/home')
 @app.route('/')
@@ -43,7 +43,15 @@ def loginselect():
 @app.route('/login/<data>',methods=['GET','POST'])
 def login(data):
     if request.method == "POST":
-        request.form['floatingInputName']
+       password= request.form['floatingPassword']
+       if data == "email":
+            value = request.form['floatingInputEmail']
+            userval=Clients()
+            user=db_context.get_item_by_other_value(userval,data,value)
+       elif data == "phone":
+            value = request.form['floatingInputPhone']
+            userval = Clients()
+            user=db_context.get_item_by_other_value(userval, data, value)
     return render_template('login.html', data=data,user=user)
 
 

@@ -83,10 +83,23 @@ class DbContext:
             print(f"Error getting last index from {obj.__class__.__name__}: {str(e)}")
             return 0
 
+    def get_item_by_other_value(self, other_class_instance, item, value):
+        array_items = list(other_class_instance.__dict__.keys())
+        table = other_class_instance.__class__.__name__
 
+        query = f"SELECT * FROM {table} WHERE {item} = ?"
 
+        self.cursor.execute(query, (value,))
+        row = self.cursor.fetchone()
 
+        if row:
+            new_instance = type(other_class_instance)()
+            for idx, attribute in enumerate(array_items):
+                setattr(new_instance, attribute, row[idx] if row[idx] is not None else "")
 
+            return new_instance
+
+        return None
 
 
 db_context = DbContext()
