@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Зареєструватись
+{% endblock %}
+
+
+{% block body %}
+<div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
+  <form class="text-center" method="post">
+    <h1 class="h3 mb-3 fw-normal">Реєстрація</h1>
+    <div class="form-floating">
+      <input  type="text" class="form-control" id="floatingInputName" name="floatingInputName" placeholder="Ім'я" required>
+      <label for="floatingInputPhone">Ім'я та прізвище</label>
+    </div>
+    <div class="form-floating">
+      <input type="email" class="form-control" id="floatingInputEmail" name="floatingInputEmail" placeholder="name@example.com" required>
+      <label for="floatingInput">Введіть email</label>
+    </div>
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingInputPhone" name="floatingInputPhone" placeholder="Phone" required>
+      <label id ="labphone"for="floatingInputPhone">Введіть телефон</label>
+    </div>
+    <div class="form-floating">
+  <input type="password" class="form-control" id="floatingInputPassOne" name="floatingInputPassOne" placeholder="Password" required>
+  <label for="floatingPassword">Пароль</label>
+</div>
+<div class="form-floating">
+  <input type="password" class="form-control" id="floatingInputPassTwo" name="floatingInputPassTwo" placeholder="Password" required>
+  <label id="labtwo" for="floatingPassword">Повторіть пароль</label>
+</div>
+<script>
+  ddocument.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('floatingInputPhone').addEventListener('blur', function () {
+      let labphone = document.getElementById('labphone');
+      let phoneNumber = this.value.replace(/\D/g, '');
+
+      if (phoneNumber.length === 10) {
+        this.style.border = "2px solid green";
+        labphone.innerHTML = "Номер телефону вірний";
+        //this.value = "+" + phoneNumber;
+      } else {
+        this.style.border = "2px solid red";
+        labphone.innerHTML = "Введіть вірний номер телефону";
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('floatingInputPhone').addEventListener('blur', function () {
+      if (this.value.length<=11) {
+        let labphone = document.getElementById('labphone');
+        this.style.border = "2px solid red";
+        labphone.innerHTML = "Введіть вірний номер";
+        let tmp ="+"
+            tmp+=this.value
+          this.value=""
+          this.value=tmp
+      }
+    });
+  });
+
+  function intersting(event) {
+    let pass2 = document.getElementById('floatingInputPassTwo');
+    let pass1 = document.getElementById('floatingInputPassOne');
+    let labeltwo = document.getElementById('labtwo');
+    if (pass1.value !== pass2.value && pass1.value !== "" && pass2.value !== "") {
+      pass2.style.border = "2px solid red";
+      labeltwo.innerHTML = "Введіть схожий пароль";
+      event.preventDefault();
+    }
+    else{
+        if (pass1.value !== "" && pass2.value !== "") {
+
+        }
+    }
+  }
+</script>
+<button class="btn btn-primary w-100 py-2" type="submit" id="buttonsumb" onclick="intersting(event)">Зареєструватись</button>
+<p class="mt-5 mb-3 text-body-secondary">©2024</p>
+
+  </form>
+</div>
+
+{% endblock %}

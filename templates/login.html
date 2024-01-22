@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Ввійти в акаунт
+{% endblock %}
+
+
+{% block body %}
+<div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
+  <form class="text-center"  method="post">
+    <h1 class="h3 mb-3 fw-normal">Вхід</h1>
+    {% if data == 'email' %}
+    <div class="form-floating">
+      <input type="email" class="form-control" id="floatingInputEmail" name="floatingInputEmail" placeholder="name@example.com">
+      <label for="floatingInput">Введіть email</label>
+    </div>
+      {% endif %}
+      {% if data == 'phone' %}
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingInputPhone" name="floatingInputPhone" placeholder="Phone">
+      <label for="floatingInputPhone">Введіть телефон</label>
+    </div>
+      {% endif %}
+    <div class="form-floating">
+      <input type="password" class="form-control" id="floatingPassword" name="floatingPassword" placeholder="Password">
+      <label for="floatingPassword">Введіть пароль</label>
+    </div>
+
+    <button class="btn btn-primary w-100 py-2" type="submit">Ввійти</button>
+    <p class="mt-5 mb-3 text-body-secondary">©2024</p>
+  </form>
+</div>
+
+{% endblock %}

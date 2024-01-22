@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Виберіть спосіб входу
+{% endblock %}
+
+
+{% block body %}
+     <script>
+    function redirectToLogin() {
+        let selectedOption = document.querySelector('input[name="listGroupCheckableRadios"]:checked').value;
+        window.location.href = "/login/" + selectedOption;
+    }
+</script>
+
+
+<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+    <div class="list-group list-group-checkable d-grid gap-2 border-0">
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios1" value="email" checked="">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios1">
+            Через email
+        </label>
+
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios2" value="phone">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios2">
+            Через телефон
+        </label>
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="redirectToLogin()">Ввійти</button>
+</div>
+
+{% endblock %}

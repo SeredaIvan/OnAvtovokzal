@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %}</title>
+
+</head>
+<body>
+<header class="p-3 text-bg-dark">
+    <div class="container" >
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+            <h1 style="margin-right: 20px">OnAvtovokzal</h1>
+        </a>
+
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="/home" class="nav-link px-2 text-secondary">Головна</a></li>
+          <li><a href="/journeys" class="nav-link px-2 text-white">Розписання всіх автобусів</a></li>
+          <li><a href="#" class="nav-link px-2 text-white">Купити квиток</a></li>
+          <li><a href="/About" class="nav-link px-2 text-white">Про нас</a></li>
+        </ul>
+
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+           <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('search').addEventListener('focus', function() {
+                    this.value = "";
+                });
+            });
+           </script>
+           <input type="search" id="search" class="form-control form-control-dark text-bg-dark" value="Напишіть код квитка...">
+        </form>
+        {% if user.name=="" %}
+        <div class="text-end authorizationnotcompleted">
+          <button type="button" class="btn btn-outline-light me-2" onclick="redirectToLogin()"> Ввійти</button>
+          <button type="button" class="btn btn-primary" onclick="redirectToRegister()">Зареєструватися</button>
+        </div>
+          {% endif %}
+        {% if user.name!="" %}
+        <div class="text-end authorizationcompleted" style="margin-right:-50px ">
+            <img src="{{ url_for('static', filename='svgs/profile.svg') }}" alt="Profile SVG" width="64px" height="64px">
+        </div>{% endif %}
+        <script>
+            function redirectToLogin() {
+                window.location.href = "/loginselect";
+            }
+
+            function redirectToRegister() {
+                window.location.href = "/register";
+            }
+        </script>
+      </div>
+    </div>
+  </header>
+    {% block body %}{% endblock %}
+
+    <footer class="py-3 my-4 bg-body-secondary">
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+      <li class="nav-item"><a href="/home" class="nav-link px-2 text-body-secondary">Home</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Features</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Pricing</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">FAQs</a></li>
+      <li class="nav-item"><a href="/about" class="nav-link px-2 text-body-secondary">About</a></li>
+    </ul>
+    <p class="text-center text-body-secondary ">© 2023 OnAvtovokzal, Inc</p>
+  </footer>
+</body>
+</html>

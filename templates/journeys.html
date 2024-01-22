@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Розклад автобусів
+{% endblock %}
+
+{% block body %}
+
+    <h1>Розклад всіх автобусів</h1>
+
+    <div class="bd-example-snippet bd-code-snippet"><div class="bd-example m-0 border-0">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Назва</th>
+            <th scope="col">Місця</th>
+            <th scope="col">Місто відправлення</th>
+            <th scope="col">Місто прибуття</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for bus in buses %}
+          <tr>
+            <th scope="row">{{ bus.id_bus }}</th>
+            <td> {{ bus.name }}</td>
+            <td>{{ bus.seats }}</td>
+            <td>{{ bus.bus_number }}</td>
+            <td>{{ bus.bus_number }}</td>
+          </tr>
+
+          {% endfor %}
+          </tbody>
+
+        </table>
+        </div></div>
+
+{% endblock %}

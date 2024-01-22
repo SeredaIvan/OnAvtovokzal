@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Головна
+{% endblock %}
+
+{% block body %}
+    <div class="b-example-divider"></div>
+
+    <div class="my-5">
+        <div></div>
+    </div>
+
+    <div class="b-example-divider"></div>
+
+    <div class="my-5 ">
+        <form class="form-control bg-body-secondary">
+            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start"><input  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
+                <div class="col d-flex align-items-start"><input  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
+                <div class="col d-flex align-items-start"><button class="btn btn-primary" type="submit">Дивитись маршрути</button></div>
+            </div>
+        </form>
+    </div>
+    <div class="my-5">
+  <div class="p-5 text-center bg-body-secondary">
+    <div class="container py-5">
+      <h1 class="text-body-emphasis">Ласкаво просимо на "OnAvtovokzal" – ваш онлайн автовокзал!</h1>
+      <p class="col-lg-8 mx-auto lead">
+        Вітаємо вас на найзручнішому та найсучаснішому сервісі для планування вашого мандрівного дня. "OnAvtovokzal" - це онлайн платформа, яка дозволяє вам легко та зручно організувати ваші подорожі автобусом.
+      </p>
+    </div>
+  </div>
+</div>
+
+    <div class="b-example-divider"></div>
+<div class="p-5 text-center bg-body-secondary">
+<div class="container px-4 py-5 " id="hanging-icons">
+    <h2 class="pb-2 border-bottom">Наші можливості:</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-4">
+      <div class="col d-flex align-items-start">
+        <div style="" class="icon-square text-body-emphasis y d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Розклад автобусів</h3>
+          <p>Переглядайте актуальний розклад руху автобусів, обирайте зручний час відправлення та призначення.</p>
+          <a href="#" class="btn btn-primary">
+            Primary button
+          </a>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Пошук маршрутів</h3>
+          <p>Знаходьте оптимальні маршрути між містами та вибирайте найзручніші варіанти подорожі.</p>
+          <a href="#" class="btn btn-primary">
+            Primary button
+          </a>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Квитки онлайн</h3>
+          <p> Бронюйте та оплачуйте квитки прямо на сайті, уникайте черг та забезпечте собі місце в потрібному вам автобусі.</p>
+          <a href="#" class="btn btn-primary">
+            Primary button
+          </a>
+        </div>
+      </div>
+        <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Інформація про автобуси</h3>
+          <p>Детальна інформація про автобуси, включаючи кількість місць, номер автобуса та інше.</p>
+          <a href="#" class="" style="">
+            Дізнатись інформацію
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
