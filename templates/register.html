@@ -6,6 +6,13 @@
 
 
 {% block body %}
+    {% if info is not none %}
+        <script>
+            let info = {{ info|tojson|safe }}
+            alert(info)
+        </script>
+    {% endif %}
+
 <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
   <form class="text-center" method="post">
     <h1 class="h3 mb-3 fw-normal">Реєстрація</h1>
@@ -30,7 +37,9 @@
   <label id="labtwo" for="floatingPassword">Повторіть пароль</label>
 </div>
 <script>
-  ddocument.addEventListener('DOMContentLoaded', function () {
+    let username = "{{ user.name }}";
+    console.log("NAME "+username)
+  document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('floatingInputPhone').addEventListener('blur', function () {
       let labphone = document.getElementById('labphone');
       let phoneNumber = this.value.replace(/\D/g, '');
@@ -48,14 +57,11 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('floatingInputPhone').addEventListener('blur', function () {
-      if (this.value.length<=11) {
+
+      if (this.value.length<=11||this.value.match(/[a-zA-ZА-Яа-я]/)) {
         let labphone = document.getElementById('labphone');
         this.style.border = "2px solid red";
         labphone.innerHTML = "Введіть вірний номер";
-        let tmp ="+"
-            tmp+=this.value
-          this.value=""
-          this.value=tmp
       }
     });
   });

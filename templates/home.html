@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+        let name = "{{ user.name }}";
+        let email = "{{ user.email }}";
+        let id = "{{ user.id_client }}";
+        let phone = "{{ user.phone }}";
+        console.log(id+""+name+""+phone+""+email)
+
+    </script>
     <div class="b-example-divider"></div>
 
     <div class="my-5">

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Аккаунт користувача
+{% endblock %}
+
+
+{% block body %}
+    <h1>Акаунт користувача</h1>
+    <h2>ПІБ</h2>
+    <h2><strong>{{ user.name }}</strong></h2>
+    <h2>Email</h2>
+    <h2><strong>{{ user.email }} </strong></h2>
+    <h2>Телефон</h2>
+    <h2><strong>{{ user.phone }}</strong></h2>
+    <a href="usertickets">Мої квитки</a>
+{% endblock %}

@@ -1,6 +1,6 @@
 class Buses:
     def __init__(self):
-        self.id_bus = 0
-        self.name = ""
-        self.seats = 0
-        self.bus_number = ""
+        self.id_bus = None
+        self.name = None
+        self.seats = None
+        self.bus_number = None

@@ -6,6 +6,11 @@
 
 
 {% block body %}
+    {% if info=="Не вірний пароль" %}
+        <script>
+           alert("Не вірний пароль")
+        </script>
+    {% endif %}
 <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
   <form class="text-center"  method="post">
     <h1 class="h3 mb-3 fw-normal">Вхід</h1>
@@ -23,7 +28,7 @@
       {% endif %}
     <div class="form-floating">
       <input type="password" class="form-control" id="floatingPassword" name="floatingPassword" placeholder="Password">
-      <label for="floatingPassword">Введіть пароль</label>
+      <label id="passwordlabel" for="floatingPassword">Введіть пароль</label>
     </div>
 
     <button class="btn btn-primary w-100 py-2" type="submit">Ввійти</button>

@@ -101,23 +101,26 @@ class DbContext:
 
         return None
 
+    def get_user(self, password, item, value):
+        query = f"SELECT * FROM clients WHERE {str(item)} = ?"
+        self.cursor.execute(query, (str(value),))
+        row = self.cursor.fetchone()
+        if row:
+            user = Clients()
+            attributes = list(user.__dict__.keys())
+            for attribute, row_value in zip(attributes, row):
+                setattr(user, attribute, row_value if row_value is not None else "")
+            print(str(user.id_client)+" "+user.name+" "+user.phone+" "+user.password+" "+user.email)
+            if user.password == password:
+                print("User authorized")
+                print("Row values:", row)
+                return user
+            else :
+                print("incorect password")
+                return "Пароль не співпадає"
 
-db_context = DbContext()
+        print("None account")
+        return None
 
-bus=Buses()
-buses=db_context.get_items(bus)
-
-
-
-#clientx= db_context.get_item_by_id(clientx,4)
-#bus =db_context.get_item_by_id(bus,3)
-
-#for idx, client in enumerate(clients_list):
-    #print(f"ID: {client.id_client}, Name: {client.name}, phone: {client.phone},  email: {client.email}")
-#print(f"IDX: {clientx.id_client}, Name: {clientx.name}, phone: {clientx.phone},  email: {clientx.email}")
-
-
-for idx, bus in enumerate(buses):
-    print(f"ID: {bus.id_bus}, Name: {bus.name}, Seats: {bus.seats}, Bus Number: {bus.bus_number}")
 
 

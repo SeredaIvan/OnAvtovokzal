@@ -1,7 +1,7 @@
 class Tickets:
     def __init__(self):
-        self.id_ticket =0
-        self.id_bus = 0
-        self.id_client = 0
-        self.id_journey = 0
-        self.seat = 0
+        self.id_ticket =None
+        self.id_bus = None
+        self.id_client = None
+        self.id_journey = None
+        self.seat = None

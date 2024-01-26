@@ -11,12 +11,48 @@
         let selectedOption = document.querySelector('input[name="listGroupCheckableRadios"]:checked').value;
         window.location.href = "/login/" + selectedOption;
     }
+    document.addEventListener('DOMContentLoaded', function () {
+    let radioButtons = document.querySelectorAll('input[name="listGroupCheckableRadios"]');
+    let labels = document.querySelectorAll('label.list-group-item');
+
+    for (let i = 0; i < radioButtons.length; i++) {
+        radioButtons[i].addEventListener('change', function () {
+            for (let j = 0; j < radioButtons.length; j++) {
+                labels[j].classList.remove("active");
+                labels[j].classList.add("non-active");
+                radioButtons[j].checked = false;
+            }
+
+            labels[i].classList.remove("non-active");
+            labels[i].classList.add("active");
+            this.checked = true;
+        });
+    }
+});
+
+
+            /*radioButton.addEventListener('change', function () {
+                radioButtons.forEach(function (otherRadioButton) {
+                    let label = otherRadioButton.parentElement.querySelector('label');
+                    if (otherRadioButton.checked) {
+                        label.style.background = '';
+                        label.style.border = '';
+                    }
+                });
+
+                let label = this.parentElement.querySelector('label');
+                if (this.checked) {
+                    label.style.background = 'grey';
+                    label.style.border = '1px solid lightblue';
+                }
+            });*/
+
 </script>
 
 
 <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
     <div class="list-group list-group-checkable d-grid gap-2 border-0">
-        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios1" value="email" checked="">
+        <input  style="display: none;" class="list-group-item-check pe-none " type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios1" value="email" checked="">
         <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios1">
             Через email
         </label>

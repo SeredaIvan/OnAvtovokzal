@@ -13,7 +13,7 @@
 <header class="p-3 text-bg-dark">
     <div class="container" >
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+        <a href="/home" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
             <h1 style="margin-right: 20px">OnAvtovokzal</h1>
         </a>
 
@@ -34,13 +34,20 @@
            </script>
            <input type="search" id="search" class="form-control form-control-dark text-bg-dark" value="Напишіть код квитка...">
         </form>
-        {% if user is not defined%}
+          {% if user is not none %}
+        <div class="text-end authorizationcompleted" style="margin-right:-50px ">
+            <a href="/accountview"> <img src="{{ url_for('static', filename='svgs/profile.svg') }}" alt="Profile SVG" width="64px" height="64px"></a>
+        </div>
+        {% endif %}
+        {% if user is none %}
         <div class="text-end authorizationnotcompleted">
           <button type="button" class="btn btn-outline-light me-2" onclick="redirectToLogin()"> Ввійти</button>
           <button type="button" class="btn btn-primary" onclick="redirectToRegister()">Зареєструватися</button>
         </div>
-        {% endif %}
-        
+          {% endif %}
+
+
+
         <script>
             function redirectToLogin() {
                 window.location.href = "/loginselect";
