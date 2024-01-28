@@ -1,0 +1,30 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Адмінпанель
+{% endblock %}
+
+
+{% block body %}
+
+    <div class="my-5 ">
+        <div class="bg-body-secondary my-5 text-center" style="padding: 30px">
+            <a href="/addbus" class="btn btn-primary">Додати автобус</a>
+            <a href="/updatebus" class="btn btn-primary">Оновити дані про автобус</a>
+        </div>
+        <div class="bg-body-secondary my-5 text-center" style="padding: 30px">
+            <a href="/addcity" class="btn btn-primary">Додати місто</a>
+            <a href="/updatebus" class="btn btn-primary">Оновити дані про місто</a>
+        </div>
+        <div class="bg-body-secondary my-5 text-center" style="padding: 30px">
+            <a href="/addjourney" class="btn btn-primary">Додати маршрут</a>
+            <a href="/updatejourney" class="btn btn-primary">Оновити дані про маршрут</a>
+        </div>
+        <div class="bg-body-secondary my-5 text-center" style="padding: 30px">
+            <a href="/addadmin" class="btn btn-primary">Додати адміна</a>
+            <a href="/killuser" class="btn btn-primary">Видалити користувача</a>
+        </div>
+     </div>
+    <a href="http://google.com" class="btn btn-primary">Вийти в гугл</a>
+
+{% endblock %}

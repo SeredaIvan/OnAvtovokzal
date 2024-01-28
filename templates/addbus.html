@@ -1,0 +1,25 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Додати автобус
+{% endblock %}
+
+
+{% block body %}
+    {% if info is not none %}
+        <script>
+           alert("Автобус не додано")
+        </script>
+    {% endif %}
+    <h1>Додавання нового автобуса</h1>
+    <form method="post">
+        <input type="text" name="nameBus" id="nameBus">
+        <label for="nameBus">Назва автобуса</label><br>
+        <input type="text" name="seats" id="seats">
+        <label for="seats">Кількість місць</label><br>
+        <input type="text" name="busNumber" id="seats">
+        <label for="busNumber">Номер автобуса</label><br>
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+    <a href="/adminpanel" class="btn btn-primary">Назад</a>
+{% endblock %}

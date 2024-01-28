@@ -1,0 +1,34 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Додати поїздку
+{% endblock %}
+
+
+{% block body %}
+    {% if info is not none %}
+        <script>
+           alert("Поїздку не додано")
+        </script>
+    {% endif %}
+
+    <h1>Додавання нової поїздки</h1>
+    <form method="post" >
+        <input type="text" name="idbus" id="idbus">
+        <label for="idbus">ID Автобуса</label><br>
+        <input type="text" name="idcitystart" id="idcitystart">
+        <label for="idcitystart">Місто відправлення</label><br>
+        <input type="text" name="idcityfinish" id="idcityfinish">
+        <label for="idcityfinish">Місто прибуття</label><br>
+        <input type="text" name="cost" id="cost">
+        <label for="cost">Плата за проїзд</label><br>
+        <input type="datetime-local" name="timestart" id="timestart">
+        <label for="timestart">Час відправлення</label><br>
+        <input type="datetime-local" name="timefinish" id="timefinish">
+        <label for="timefinish">Час прибуття</label><br>
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+
+
+    <a href="/adminpanel" class="btn btn-primary">Назад</a>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Додати місто
+{% endblock %}
+
+
+{% block body %}
+    {% if info is not none %}
+        <script>
+           alert("Місто не додано")
+        </script>
+    {% endif %}
+    <h1>Додавання нового міста</h1>
+    <form method="post">
+        <input type="text" name="nameCity" id="nameCity">
+        <label for="nameCity">Назва міста</label><br>
+        <input type="text" name="country" id="country">
+        <label for="country">Країна</label><br>
+        <button type="submit" class="btn btn-primary">Додати</button>
+        <a href="/adminpanel" class="btn btn-primary">Назад</a>
+    </form>
+{% endblock %}

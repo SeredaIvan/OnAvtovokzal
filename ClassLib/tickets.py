@@ -5,3 +5,4 @@ class Tickets:
         self.id_client = None
         self.id_journey = None
         self.seat = None
+        self.date_buying = None

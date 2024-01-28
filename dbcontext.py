@@ -1,6 +1,7 @@
 import pyodbc
 from ClassLib.buses import Buses
 from ClassLib.clients import Clients
+from ClassLib.timetable import Timetable
 
 
 class DbContext:
@@ -42,6 +43,7 @@ class DbContext:
             bus_instance = Buses()
             for idx, item in enumerate(array_items):
                 value = row[idx]
+                print(value)
                 setattr(bus_instance, item, value if value is not None else "")
             other_class_instance=bus_instance
 
@@ -65,6 +67,8 @@ class DbContext:
         except Exception as e:
             print(f"Error adding item to {obj.__class__.__name__} table: {str(e)}")
             return False
+
+
 
     def select_last_index(self,obj):
         array_items = list(obj.__dict__.keys())
@@ -121,6 +125,44 @@ class DbContext:
 
         print("None account")
         return None
+
+    def update_item(self, id, item, value, obj):
+        nametable = obj.__class__.__name__
+
+        if nametable=="Buses":
+            name_id='id_bus'
+        elif nametable=="Clients":
+            name_id='id_client'
+        elif nametable=="Timetable":
+            name_id='id_journey'
+        elif nametable != "Timetable":
+            tmp = nametable.lower()
+            name_id = f"id_{tmp[:-1]}"
+        else:
+            print("err on DBContext at 142 line")
+
+        query = f"UPDATE {nametable} SET {item}=? WHERE {name_id}=?"
+        values = (str(value), id)
+
+        try:
+            with self.conn:
+                with self.cursor.execute(query, values):
+                    print(f"Update successful for {item} with value {value} for record with {name_id}={id} in table {nametable}.")
+        except Exception as e:
+            print(f"Error updating record: {e}")
+
+    def delete_item(self, obj, item, value):
+        nametable = obj.__class__.__name__
+        query = f"DELETE FROM {nametable} WHERE {item} = ?"
+        values = (value,)
+
+        try:
+            with self.conn:
+                with self.cursor.execute(query, values):
+                    print(f"Delete successful from {nametable} where {item} = {value}.")
+        except Exception as e:
+            print(f"Error deleting record: {e}")
+
 
 
 

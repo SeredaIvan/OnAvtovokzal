@@ -1,0 +1,30 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Додати поїздку
+{% endblock %}
+
+
+{% block body %}
+    {% if info is not none %}
+        <script>
+           alert("Адміністратора не додано")
+        </script>
+    {% endif %}
+
+    <h1>Додавання нової поїздки</h1>
+    <form method="post" >
+        <input type="text" name="name" id="name">
+        <label for="name">Ім'я Адміністратора</label><br>
+        <input type="text" name="email" id="email">
+        <label for="email">Email</label><br>
+        <input type="text" name="phone" id="phone">
+        <label for="phone">Phone</label><br>
+        <input type="text" name="password" id="password">
+        <label for="password">password</label><br>
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+
+
+    <a href="/adminpanel" class="btn btn-primary">Назад</a>
+{% endblock %}
