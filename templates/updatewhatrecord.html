@@ -1,0 +1,49 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+    Оновити запис
+{% endblock %}
+
+{% block body %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    let radioButtons = document.querySelectorAll('input[name="listGroupCheckableRadios"]');
+    let labels = document.querySelectorAll('.list-group-item');
+
+    for (let i = 0; i < radioButtons.length; i++) {
+        radioButtons[i].addEventListener('change', function () {
+            for (let j = 0; j < radioButtons.length; j++) {
+                if (radioButtons[j].checked) {
+                    labels[j].classList.add("active");
+                    labels[j].classList.remove("non-active");
+                } else {
+                    labels[j].classList.remove("active");
+                    labels[j].classList.add("non-active");
+                }
+            }
+        });
+    }
+});
+
+    function redirectToNext(event) {
+        event.preventDefault()
+        let selectedOption = document.querySelector('input[name="listGroupCheckableRadios"]:checked').value;
+        let clas="{{ clas.__class__.__name__ }}"
+        console.log(clas)
+        window.location.href = "/updatepost/" + selectedOption+"/"+clas;
+    }
+    </script>
+    <form method="post">
+        <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+            <div class="list-group list-group-checkable d-grid gap-2 border-0">
+                <h2>Що оновлюємо ?</h2>
+                {% for i in fieldlist %}
+                    <input  class="list-group-item-check pe-none " type="radio" name="listGroupCheckableRadios" id="{{ i }}" value="{{ i }}" style="display: none;">
+                    <label  class="list-group-item rounded-3 py-3 active" for="{{ i }}">{{ i }}</label><br>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary" onclick="redirectToNext(event)">Оновити це</button>
+                <a href="/adminpanel" class="btn btn-primary">Назад</a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -140,16 +140,19 @@ class DbContext:
             name_id = f"id_{tmp[:-1]}"
         else:
             print("err on DBContext at 142 line")
+            return False
 
         query = f"UPDATE {nametable} SET {item}=? WHERE {name_id}=?"
-        values = (str(value), id)
+        values = (value, id)
 
         try:
             with self.conn:
                 with self.cursor.execute(query, values):
                     print(f"Update successful for {item} with value {value} for record with {name_id}={id} in table {nametable}.")
+                    return True
         except Exception as e:
             print(f"Error updating record: {e}")
+            return False
 
     def delete_item(self, obj, item, value):
         nametable = obj.__class__.__name__

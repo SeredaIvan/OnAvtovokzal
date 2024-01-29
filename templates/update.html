@@ -1,0 +1,56 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+Update
+{% endblock %}
+
+
+{% block body %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    let radioButtons = document.querySelectorAll('input[name="listGroupCheckableRadios"]');
+    let labels = document.querySelectorAll('.list-group-item');
+
+    for (let i = 0; i < radioButtons.length; i++) {
+        radioButtons[i].addEventListener('change', function () {
+            for (let j = 0; j < radioButtons.length; j++) {
+                if (radioButtons[j].checked) {
+                    labels[j].classList.add("active");
+                    labels[j].classList.remove("non-active");
+                } else {
+                    labels[j].classList.remove("active");
+                    labels[j].classList.add("non-active");
+                }
+            }
+        });
+    }
+});
+    </script>
+
+    <form method="post">
+    <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+        <div class="list-group list-group-checkable d-grid gap-2 border-0">
+            <h2>Виберіть що хочете оновити</h2>
+        <input  style="display: none;" class="list-group-item-check pe-none " type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios1" value="bus" checked="">
+        <label class="list-group-item rounded-3 py-3 active" for="listGroupCheckableRadios1">
+            Автобус
+        </label>
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios2" value="journey">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios2">
+            Подорож
+        </label>
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios3" value="city">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios3">
+            Місто
+        </label>
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios4" value="ticket">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios4">
+            Квиток
+        </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </div>
+    </form>
+    <a href="/adminpanel" class="btn btn-primary">Назад</a>
+{% endblock %}

@@ -43,7 +43,7 @@ def loginselect():
 
 @app.route('/login/<data>',methods=['GET','POST'])
 def login(data):
-    if request.method == "POST":
+    if request.method == "POST" :
         item=str(data)
         password= request.form['floatingPassword']
         if data == "email":
@@ -108,7 +108,7 @@ def accountview():
 def addbus():
     if request.method=="GET":
         if GetFromDict() is not None:
-            return render_template("addbus.html", user=GetFromDict(),info=None)
+            return render_template("addbus.html", info=None)
         else:
             return redirect("/home")
     if request.method=="POST":
@@ -118,15 +118,15 @@ def addbus():
         bus.bus_number=str(request.form['busNumber'])
         bus.seats_occupied=0
         if db_context.add_item(bus):
-            return render_template("addbus.html", user=GetFromDict(),info=None)
+            return render_template("addbus.html", info=None)
         else:
-            return render_template("addbus.html", user=GetFromDict(),info="Не додано")
+            return render_template("addbus.html", info="Не додано")
 
 @app.route('/addcity', methods=['POST','GET'])
 def addcity():
     if request.method=="GET":
         if GetFromDict() is not None:
-            return render_template("addcity.html", user=GetFromDict(),info=None)
+            return render_template("addcity.html", info=None)
         else:
             return redirect("/home")
     if request.method=="POST":
@@ -134,16 +134,16 @@ def addcity():
         city.name=str(request.form['nameCity'])
         city.country=str(request.form['country'])
         if db_context.add_item(city):
-            return render_template("addcity.html", user=GetFromDict(),info=None)
+            return render_template("addcity.html", info=None)
         else:
-            return render_template("addcity.html", user=GetFromDict(),info="Не додано")
+            return render_template("addcity.html", info="Не додано")
 
 
 @app.route('/addjourney', methods=['POST', 'GET'])
 def addjourney():
     if request.method == "GET":
         if GetFromDict() is not None:
-            return render_template("addjourney.html", user=GetFromDict(), info=None)
+            return render_template("addjourney.html", info=None)
         else:
             return redirect("/home")
 
@@ -157,16 +157,16 @@ def addjourney():
         journey.time_finish = datetime.strptime(request.form['timefinish'], '%Y-%m-%dT%H:%M')
 
         if db_context.add_item(journey):
-            return render_template("addjourney.html", user=GetFromDict(), info=None)
+            return render_template("addjourney.html", info=None)
         else:
-            return render_template("addjourney.html", user=GetFromDict(), info="Не додано")
+            return render_template("addjourney.html", info="Не додано")
 
 
 @app.route('/addadmin', methods=['POST', 'GET'])
 def addadmin():
     if request.method == "GET":
         if GetFromDict() is not None:
-            return render_template("addadmin.html", user=GetFromDict(), info=None)
+            return render_template("addadmin.html", info=None)
         else:
             return redirect("/home")
 
@@ -178,9 +178,9 @@ def addadmin():
         user.password=str(request.form['password'])
         user.role_client='admin'
         if db_context.add_item(user):
-            return render_template("addadmin.html", user=GetFromDict(), info=None)
+            return render_template("addadmin.html", info=None)
         else:
-            return render_template("addadmin.html", user=GetFromDict(), info="Не додано")
+            return render_template("addadmin.html", info="Не додано")
 
 
 #@app.route('/killuser', methods=['POST', 'GET'])
@@ -198,6 +198,91 @@ def addadmin():
 #        else:
 #            return render_template("killuser.html", user=GetFromDict(), info="Не додано")
 
+@app.route('/update', methods=['POST','GET'])
+def update():
+    if request.method=="GET":
+        if GetFromDict():
+            if GetFromDict().role_client == "admin":
+                return render_template("update.html")
+        else:
+            return redirect("/home")
+    if request.method=="POST":
+        selected_radio = request.form.get('listGroupCheckableRadios')
+
+        if selected_radio == "bus":
+            bus=Buses()
+            fieldlist=GetClassFields(bus)
+            return render_template("updatewhatrecord.html", fieldlist=fieldlist,clas=bus)
+        elif selected_radio == "journey":
+            journey=Timetable()
+            fieldlist = GetClassFields(journey)
+            return render_template("updatewhatrecord.html", fieldlist=fieldlist,clas=journey)
+        elif selected_radio == "city":
+            city=Cities()
+            fieldlist = GetClassFields(city)
+            return render_template("updatewhatrecord.html", fieldlist=fieldlist,clas=city)
+        elif selected_radio == "ticket":
+            tick=Tickets()
+            fieldlist = GetClassFields(tick)
+            return render_template("updatewhatrecord.html", fieldlist=fieldlist,clas=tick)
+
+        return redirect("/adminpanel")
+
+
+@app.route('/updatewhatrecord', methods=['POST', 'GET'])
+def updatewhatrecord():
+    if request.method == "GET":
+        if GetFromDict() is not None:
+            if GetFromDict().role_client == "admin":
+                return render_template("updatewhatrecord.html")
+        else:
+            return redirect("/home")
+    elif request.method == "POST":
+        clas = request.args.get('clas')
+        selected_radio = request.form.get('listGroupCheckableRadios')
+
+        return render_template("updatepost.html" ,dict=dict)
+
+
+@app.route('/updatepost/<selectedfield>/<clas>', methods=['POST', 'GET'])
+def updatepost(selectedfield, clas):
+    if request.method == "GET":
+        if GetFromDict() is not None:
+            if GetFromDict().role_client == "admin":
+                ss = selectedfield
+                return render_template("updatepost.html", selectedfield=ss, clas=clas, info=None)
+        else:
+            return redirect("/home")
+
+    if request.method == "POST":
+        item = selectedfield
+        value = request.form['value']
+        type=request.form['type']
+        id = request.form['id']
+
+        try:
+            obj_class = globals()[clas]
+            obj = obj_class()
+        except KeyError:
+            return render_template("updatepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Не вдалося знайти клас")
+        try:
+            if type == "datetime":
+                value = datetime.strptime(value, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            return render_template("updatepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Помилка конвертації у формат дати/часу")
+        try:
+            if type == "int":
+                value = int(value)
+        except ValueError:
+            return render_template("updatepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Помилка конвертації у формат int")
+
+        if db_context.update_item(id, item, value, obj):
+            return render_template("adminpanel.html")
+        else:
+            return render_template("updatepost.html", selectedfield=selectedfield, clas=clas, info="Не оновлено")
 
 
 @app.route('/adminpanel')
@@ -218,6 +303,11 @@ def CreateUser(password,item, value):
     else:
         return False
 
+
+def GetClassFields(obj):
+     return list(obj.__dict__.keys())
+
+
 def AddToDict(user=Clients()):
     user_dict = user.to_dict()
     session['user'] = user_dict
@@ -231,11 +321,11 @@ def GetFromDict():
     else:
         return None
 
+
 def DeleteFromDict():
     if 'user' in session:
         del session['user']
         AddToDict()
-
 
 
 if __name__ == "__main__":

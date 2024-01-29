@@ -1,0 +1,84 @@
+{% extends 'baseadmin.html' %}
+
+{% block title %}
+    Оновити запис
+{% endblock %}
+
+{% block body %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fields = {
+                'id_bus': 'int',
+                'name': 'str',
+                'seats': 'int',
+                'seats_occupied': 'int',
+                'bus_number': 'str',
+                'id_city': 'int',
+                'country': 'str',
+                'id_client': 'int',
+                'phone': 'str',
+                'email': 'str',
+                'password': 'str',
+                'role_client': 'str',
+                'id_ticket': 'int',
+                'id_journey': 'int',
+                'seat': 'int',
+                'date_buying': 'datetime',
+                'bus_id': 'int',
+                'city_start_id': 'int',
+                'city_finish_id': 'int',
+                'cost': 'int',
+                'time_start': 'datetime',
+                'time_finish': 'datetime'
+            };
+
+            const selectedField = '{{ selectedfield }}';
+            const form = document.getElementsByTagName('form')[0];
+            console.log("field"+ selectedField);
+            let fieldType = fields[selectedField.replace(/["']/g, "")];
+            let newInput=document.createElement('input');
+            if (fieldType==='int'){
+                newInput.type='number';
+            }
+            else if (fieldType==='str'){
+                newInput.type='text';
+            }
+            else if (fieldType==='datetime'){
+                newInput.type='datetime-local';
+            }
+            newInput.name = 'value';
+            newInput.id = 'value';
+            let newLabel = document.createElement('label');
+            newLabel.for = 'value';
+            newLabel.innerHTML = "Значення поля";
+           let inp=document.createElement('input');
+            inp.type='hidden';
+            inp.id='type';
+            inp.name='type';
+            inp.value=fieldType;
+            let h2Element = document.querySelector('h2');
+            h2Element.insertAdjacentElement('afterend', newInput);
+            h2Element.insertAdjacentElement('afterend', newLabel);
+            h2Element.insertAdjacentElement('afterend', inp);
+
+});
+        function redirectToRegister(url) {
+            window.location.href = url;
+        }
+    </script>
+
+    {% if info is none %}
+        <form method="post">
+            <h2>Оновлення запису</h2>
+            <label for="id">Введіть id запису</label>
+            <input type="text" name="id" id="id" required>
+            <button type="submit">Оновити</button>
+        </form>
+
+    {% else %}
+        <script>
+            alert('Не оновлено')
+            //redirectToRegister("/updatwhatrecord")
+        </script>
+    {% endif %}
+{% endblock %}
