@@ -9,19 +9,26 @@ class DbContext:
         self.conn = pyodbc.connect("DRIVER={ODBC Driver 17 for SQL Server};SERVER=DESKTOP-TSMTSMN;DATABASE=avtovokzal;Trusted_Connection=yes")
         self.cursor = self.conn.cursor()
 
-    def get_items(self, other_class_instance):
+    def get_items(self, other_class_instance,newquery=""):
         array_items = list(other_class_instance.__dict__.keys())
         table = other_class_instance.__class__.__name__
         query = f"SELECT {', '.join(array_items)} FROM {table}"
+
+
+
+        if newquery!="":
+            query=newquery
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         result = []
+
         for row in rows:
-            bus_instance = Buses()
+            instance = other_class_instance.__class__()
             for idx, item in enumerate(array_items):
                 value = row[idx]
-                setattr(bus_instance, item, value if value is not None else "")
-            result.append(bus_instance)
+                setattr(instance, item, value if value is not None else "")
+            result.append(instance)
+        print("Item Get succes")
         return result
 
     def get_item_by_id(self, other_class_instance, item_id):

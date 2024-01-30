@@ -28,7 +28,51 @@
         <label for="timefinish">Час прибуття</label><br>
         <button type="submit" class="btn btn-primary">Додати</button>
     </form>
+    <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Назва</th>
+            <th scope="col">Місця</th>
+            <th scope="col">Місто відправлення</th>
+            <th scope="col">Місто прибуття</th>
+          </tr>
+          </thead>
 
+          <tbody>
+    {% for bus in buses %}
+          <tr>
+            <th scope="row">{{ bus.id_bus }}</th>
+            <td> {{ bus.name }}</td>
+            <td>{{ bus.seats }}</td>
+            <td>{{ bus.bus_number }}</td>
+            <td>{{ bus.bus_number }}</td>
+          </tr>
+    {% endfor %}
+    </tbody>
+
+    </table>
+    <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">ІД</th>
+            <th scope="col">Назва</th>
+            <th scope="col">Країна</th>
+          </tr>
+          </thead>
+
+          <tbody>
+    {% for city in cities %}
+          <tr>
+            <th scope="row">{{ city.id_city }}</th>
+            <td>{{ city.name }}</td>
+            <td>{{ city.country }}</td>
+          </tr>
+    {% endfor %}
+    </tbody>
+
+    </table>
 
     <a href="/adminpanel" class="btn btn-primary">Назад</a>
 {% endblock %}

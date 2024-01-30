@@ -6,6 +6,7 @@ from ClassLib.cities import Cities
 from ClassLib.clients import Clients
 from ClassLib.tickets import Tickets
 from ClassLib.timetable import Timetable
+from ClassLib.journeystable import JourneysTable
 from datetime import datetime
 
 
@@ -16,10 +17,63 @@ app.secret_key = os.urandom(24)
 db_context = DbContext()
 
 
-@app.route('/journeys')
+@app.route('/journeys',methods=['POST','GET'])
 def journeys():
-    buses = db_context.get_items(Buses())
-    return render_template("journeys.html", buses=buses,user=GetFromDict())
+    #if request.method=="GET":
+    #    buses = db_context.get_items(Buses())
+    #    journeys = db_context.get_items(Timetable())
+    #    cities = db_context.get_items(Cities())
+    #    return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities,table=None)
+    if request.method=="GET":
+
+
+        if (request.args.get('item_sort') and request.args.get('direction')):
+            item_sort = request.args.get('item_sort')
+            direction = request.args.get('direction')
+            query = (
+                f"SELECT buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish FROM timetable "
+                f"JOIN cities AS start_city ON timetable.city_start_id = start_city.id_city "
+                f"JOIN cities AS finish_city ON timetable.city_finish_id = finish_city.id_city "
+                f"JOIN buses ON timetable.bus_id = buses.id_bus ")
+            if item_sort == "Назва автобусу":
+                query += " ORDER BY bus_name"
+            elif item_sort == "За іменем міста відправлення":
+                query += " ORDER BY start_city"
+            elif item_sort == "За іменем міста прибуття":
+                query += " ORDER BY finish_city"
+            elif item_sort == "За часом відправлення":
+                query += " ORDER BY time_start"
+            elif item_sort == "За часом прибуття":
+                query += " ORDER BY time_finish"
+            else:
+                return render_template('Error', 500)
+            if direction =="По спаданню":
+                query+= " DESC"
+            elif direction =="По зростанню":
+                query+= " ASC"
+            table=db_context.get_items(JourneysTable(),newquery=query)
+            return render_template("journeys.html", user=GetFromDict(),table=table)
+        else:
+            if request.method == "GET":
+               buses = db_context.get_items(Buses())
+               journeys = db_context.get_items(Timetable())
+               cities = db_context.get_items(Cities())
+               return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities,table=None)
+
+@app.route('/journeys/filter',methods=['POST','GET'])
+def journeysfilter():
+    if request.method=="GET":
+        buses = db_context.get_items(Buses())
+        journeys = db_context.get_items(Timetable())
+        cities = db_context.get_items(Cities())
+
+        return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities)
+    if request.method=="POST":
+        item_sort=request.form['item-sort']
+        direction=request.form['direction']
+        return render_template("lala",500)
+
+
 
 
 @app.route('/')
@@ -143,7 +197,9 @@ def addcity():
 def addjourney():
     if request.method == "GET":
         if GetFromDict() is not None:
-            return render_template("addjourney.html", info=None)
+            cities = db_context.get_items(Cities())
+            buses = db_context.get_items(Buses())
+            return render_template("addjourney.html", info=None, buses=buses, cities=cities)
         else:
             return redirect("/home")
 
@@ -155,11 +211,12 @@ def addjourney():
         journey.cost = float(request.form['cost'])
         journey.time_start = datetime.strptime(request.form['timestart'], '%Y-%m-%dT%H:%M')
         journey.time_finish = datetime.strptime(request.form['timefinish'], '%Y-%m-%dT%H:%M')
-
+        cities = db_context.get_items(Cities())
+        buses = db_context.get_items(Buses())
         if db_context.add_item(journey):
-            return render_template("addjourney.html", info=None)
+            return render_template("addjourney.html", info=None, buses=buses, cities=cities)
         else:
-            return render_template("addjourney.html", info="Не додано")
+            return render_template("addjourney.html", info="Не додано", buses=buses, cities=cities)
 
 
 @app.route('/addadmin', methods=['POST', 'GET'])

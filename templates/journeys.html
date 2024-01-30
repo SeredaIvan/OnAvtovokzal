@@ -5,35 +5,158 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+    async function redirectToSelect() {
+    const itemSort = document.querySelector('select[name="item_sort"]').value;
+    const direction = document.querySelector('select[name="direction"]').value;
+    //alert("POST")
+    const formData = new FormData();
+    formData.append('item_sort', itemSort);
+    formData.append('direction', direction);
 
+    try {
+        const response = await fetch('/journeys/filter', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // Перезавантаження сторінки після успішної відправки POST-запиту
+            window.location.reload();
+        } else {
+            // Обробка помилок
+            console.error('Помилка при відправці POST-запиту');
+        }
+    } catch (error) {
+        console.error('Помилка при виконанні fetch:', error);
+    }
+}
+
+</script>
     <h1>Розклад всіх автобусів</h1>
+    <div class="my-5 ">
+        <form class="form-control bg-body-secondary">
+            <div class="row text-center">
+                <div class="col-md-8 themed-grid-col" style="padding: 5px">
+                    <div class="row justify-content-center">
+                        <div class="col-md-2 themed-grid-col justify-content-center">
+                            <div style="margin-top: 6px">Сортувати за</div>
+                        </div>
+                        <div class="col-md-6 themed-grid-col">
+                                <select name="item_sort" class="form-select" required>
+                                    <option>Назва автобусу</option>
+                                    <option>За іменем міста відправлення</option>
+                                    <option>За іменем міста прибуття</option>
+                                    <option>За часом відправлення</option>
+                                    <option>За часом прибуття</option>
+                                </select>
+                        </div>
+                        <div class="col-md-3 themed-grid-col">
+                            <select name="direction" class="form-select" required>
+                                    <option>По спаданню</option>
+                                    <option>По зростанню</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 themed-grid-col" style="padding: 5px">
+                    <button class="btn btn-primary" type="submit" id="btn_sort" onclick="redirectToSelect()">Застосувати фільтр</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if table is none %}
+        <script>
+            //alert('1')
+        </script>
+        <div class="bd-example-snippet bd-code-snippet">
+        <div class="bd-example m-0 border-0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Автобус</th>
+                        <th scope="col">Місто відправлення</th>
+                        <th scope="col">Місто прибуття</th>
+                        <th scope="col">Час відправлення</th>
+                        <th scope="col">Час прибуття</th>
+                    </tr>
+                </thead>
 
-    <div class="bd-example-snippet bd-code-snippet"><div class="bd-example m-0 border-0">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Назва</th>
-            <th scope="col">Місця</th>
-            <th scope="col">Місто відправлення</th>
-            <th scope="col">Місто прибуття</th>
-          </tr>
-          </thead>
+                <tbody>
+                    {% for journey in journeys %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>
+                            {% for bus in buses %}
+                                {% if journey.bus_id == bus.id_bus %}
+                                    {{ bus.name }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for city in cities %}
+                                {% if journey.city_start_id == city.id_city %}
+                                    {{ city.name }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for city in cities %}
+                                {% if journey.city_finish_id == city.id_city %}
+                                    {{ city.name }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ journey.time_start }}</td>
+                        <td>{{ journey.time_finish }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
 
-          <tbody>
-          {% for bus in buses %}
-          <tr>
-            <th scope="row">{{ bus.id_bus }}</th>
-            <td> {{ bus.name }}</td>
-            <td>{{ bus.seats }}</td>
-            <td>{{ bus.bus_number }}</td>
-            <td>{{ bus.bus_number }}</td>
-          </tr>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    {% if table is not none %}
+        <script>
+            //alert('2')
+        </script>
+        <div class="bd-example-snippet bd-code-snippet">
+        <div class="bd-example m-0 border-0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Автобус</th>
+                        <th scope="col">Місто відправлення</th>
+                        <th scope="col">Місто прибуття</th>
+                        <th scope="col">Час відправлення</th>
+                        <th scope="col">Час прибуття</th>
+                    </tr>
+                </thead>
 
-          {% endfor %}
-          </tbody>
+                <tbody>
+                    {% for tab in table %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>
+                             {{ tab.bus_name }}
+                        </td>
+                        <td>
+                            {{ tab.start_city }}
+                        </td>
+                        <td>
+                            {{ tab.finish_city }}
+                        </td>
+                        <td>{{ tab.time_start }}</td>
+                        <td>{{ tab.time_finish }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
 
-        </table>
-        </div></div>
-
+            </table>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
