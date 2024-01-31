@@ -10,9 +10,34 @@
 
 </head>
 <body>
-<header class="p-3 text-bg-dark">
+<style>
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #343a40; /* Choose your desired background color */
+        z-index: 1000; /* Set a higher z-index to ensure it stays on top */
+    }
+
+    /* Add some padding to the body to prevent content from being hidden under the fixed header */
+    body {
+        padding-top: 70px; /* Adjust the padding-top value based on your header's height */
+    }
+    @media (max-width: 1000px) {
+        body {
+            padding-top: 150px; /* Adjust the padding-top value for smaller screens */
+        }
+    }
+    @media (max-width: 768px) {
+        body {
+            padding-top: 200px; /* Adjust the padding-top value for smaller screens */
+        }
+    }
+</style>
+<header class="p-3 text-bg-dark" >
     <div class="container" >
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start" >
         <a href="/home" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
             <h1 style="margin-right: 20px">OnAvtovokzal</h1>
         </a>

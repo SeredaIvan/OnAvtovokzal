@@ -6,23 +6,42 @@
 
 {% block body %}
     <script>
-        let name = "{{ user.name }}";
-        let email = "{{ user.email }}";
-        let id = "{{ user.id_client }}";
-        let phone = "{{ user.phone }}";
-        console.log(id+""+name+""+phone+""+email)
-
+        async function redirectSelect() {
+            try {
+                let cityfinish = null;
+                let citystart = null;
+                const cityFinishInput = document.querySelector('input[name="cityfinish"]');
+                const cityStartInput = document.querySelector('input[name="citystart"]');
+                if (cityFinishInput && cityFinishInput.value) {
+                    cityfinish = cityFinishInput.value;
+                }
+                if (cityStartInput && cityStartInput.value) {
+                    citystart = cityStartInput.value;
+                }
+                // Construct the URL with the updated format
+                const url = `/journeys?citystart=${encodeURIComponent(citystart)}&cityfinish=${encodeURIComponent(cityfinish)}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    // Reload the page after a successful GET request
+                    window.location.href = url;
+                } else {
+                    console.error('Error sending GET request');
+                }
+            } catch (error) {
+                console.error('Error executing fetch:', error);
+            }
+    }
     </script>
-    <div class="b-example-divider"></div>
 
+    <div class="b-example-divider"></div>
     <div class="b-example-divider"></div>
 
     <div class="my-5 ">
-        <form class="form-control bg-body-secondary">
+        <form class="form-control bg-body-secondary" action="/journeys" method="GET">
             <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-                <div class="col d-flex align-items-start"><input  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
-                <div class="col d-flex align-items-start"><input  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
-                <div class="col d-flex align-items-start"><button class="btn btn-primary" type="submit">Дивитись маршрути</button></div>
+                <div class="col d-flex align-items-start"><input name="citystart"  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
+                <div class="col d-flex align-items-start"><input name="cityfinish" class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
+                <div class="col d-flex align-items-start"><button class="btn btn-primary" type="submit" onclick="redirectToSelect()">Дивитись подорожі</button></div>
             </div>
         </form>
     </div>

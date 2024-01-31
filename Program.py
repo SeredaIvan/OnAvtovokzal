@@ -9,25 +9,17 @@ from ClassLib.timetable import Timetable
 from ClassLib.journeystable import JourneysTable
 from datetime import datetime
 
-
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 db_context = DbContext()
 
 
-@app.route('/journeys',methods=['POST','GET'])
+@app.route('/journeys', methods=['GET','POST'])
 def journeys():
-    #if request.method=="GET":
-    #    buses = db_context.get_items(Buses())
-    #    journeys = db_context.get_items(Timetable())
-    #    cities = db_context.get_items(Cities())
-    #    return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities,table=None)
-    if request.method=="GET":
-
-
-        if (request.args.get('item_sort') and request.args.get('direction')):
+    try:
+        if ((request.args.get('item_sort') and request.args.get('direction') and request.args.get('citystart')) or
+                (request.args.get('citystart') and request.args.get('cityfinish'))):
             item_sort = request.args.get('item_sort')
             direction = request.args.get('direction')
             query = (
@@ -35,6 +27,25 @@ def journeys():
                 f"JOIN cities AS start_city ON timetable.city_start_id = start_city.id_city "
                 f"JOIN cities AS finish_city ON timetable.city_finish_id = finish_city.id_city "
                 f"JOIN buses ON timetable.bus_id = buses.id_bus ")
+            if request.args.get('citystart') == "Відправляємся з":
+                pass
+            elif request.args.get('citystart'):
+                citystart = request.args.get('citystart')
+                query += f" WHERE start_city.name LIKE '{citystart}'"
+            if request.args.get('cityfinish')=="Їдем в":
+                pass
+            elif request.args.get('cityfinish'):
+                cityfinish = request.args.get('cityfinish')
+                query += f" AND finish_city.name LIKE '{cityfinish}'"
+            if request.args.get('starttime') and request.args.get('finishtime'):
+                starttime = request.args.get('starttime')
+                finishtime = request.args.get('finishtime')
+
+                starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M')
+                finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M')
+
+                query += f" AND timetable.time_start BETWEEN '{starttime}' AND '{finishtime}'"
+
             if item_sort == "Назва автобусу":
                 query += " ORDER BY bus_name"
             elif item_sort == "За іменем міста відправлення":
@@ -47,33 +58,23 @@ def journeys():
                 query += " ORDER BY time_finish"
             else:
                 return render_template('Error', 500)
-            if direction =="По спаданню":
-                query+= " DESC"
-            elif direction =="По зростанню":
-                query+= " ASC"
-            table=db_context.get_items(JourneysTable(),newquery=query)
-            return render_template("journeys.html", user=GetFromDict(),table=table)
-        else:
-            if request.method == "GET":
-               buses = db_context.get_items(Buses())
-               journeys = db_context.get_items(Timetable())
-               cities = db_context.get_items(Cities())
-               return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities,table=None)
 
-@app.route('/journeys/filter',methods=['POST','GET'])
-def journeysfilter():
-    if request.method=="GET":
-        buses = db_context.get_items(Buses())
-        journeys = db_context.get_items(Timetable())
-        cities = db_context.get_items(Cities())
+            if direction == "По спаданню":
+                query += " DESC"
+            elif direction == "По зростанню":
+                query += " ASC"
 
-        return render_template("journeys.html",user=GetFromDict(), buses=buses,journeys=journeys,cities=cities)
-    if request.method=="POST":
-        item_sort=request.form['item-sort']
-        direction=request.form['direction']
-        return render_template("lala",500)
+            table = db_context.get_items(JourneysTable(), newquery=query)
+            cities = db_context.get_items(Cities())
+            return render_template("journeys.html", user=GetFromDict(), table=table, cities=cities)
 
+    except Exception as e:
+       print(f"An error occurred: {str(e)}")
 
+    buses = db_context.get_items(Buses())
+    journeys = db_context.get_items(Timetable())
+    cities = db_context.get_items(Cities())
+    return render_template("journeys.html", user=GetFromDict(), buses=buses, journeys=journeys, cities=cities, table=None)
 
 
 @app.route('/')

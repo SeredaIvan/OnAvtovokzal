@@ -18,6 +18,7 @@ class DbContext:
 
         if newquery!="":
             query=newquery
+            print(query)
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         result = []

@@ -5,23 +5,48 @@
 {% endblock %}
 
 {% block body %}
+    <style>
+    td{
+        justify-content: center;
+    }
+    </style>
     <script>
     async function redirectToSelect() {
     const itemSort = document.querySelector('select[name="item_sort"]').value;
     const direction = document.querySelector('select[name="direction"]').value;
+    const citystart = document.querySelector('select[name="citystart"]').value;
+    if (document.querySelector('input[name="cityfinish"]').value){
+        const cityfinish = document.querySelector('select[name="cityfinish"]').value;
+    }
+    if (document.querySelector('input[name="starttime"]').value){
+        const starttime = document.querySelector('select[name="starttime"]').value;
+    }
+    if (document.querySelector('input[name="finishtime"]').value){
+        const finishtime = document.querySelector('select[name="finishtime"]').value;
+    }
     //alert("POST")
     const formData = new FormData();
     formData.append('item_sort', itemSort);
     formData.append('direction', direction);
-
+    formData.append('citystart', citystart);
+    if (document.querySelector('input[name="cityfinish"]').value){
+        formData.append('cityfinish', cityfinish);
+    }
+    if (document.querySelector('input[name="starttime"]').value){
+        formData.append('starttime', starttime);
+    }
+    if (document.querySelector('input[name="finishtime"]').value){
+        formData.append('finishtime', finishtime);;
+    }
     try {
-        const response = await fetch('/journeys/filter', {
+        const response = await fetch('/journeys', {
             method: 'POST',
             body: formData
         });
 
         if (response.ok) {
             // Перезавантаження сторінки після успішної відправки POST-запиту
+            window.location.href='/journeys';
             window.location.reload();
         } else {
             // Обробка помилок
@@ -33,16 +58,37 @@
 }
 
 </script>
-    <h1>Розклад всіх автобусів</h1>
+    <div class=" text-center bg-body-secondary">
+        <div class="container py-3">
+            <h1>Розклад всіх автобусів</h1>
+        </div>
+    </div>
+
+    <div class="b-example-divider"></div>
+
     <div class="my-5 ">
         <form class="form-control bg-body-secondary">
             <div class="row text-center">
-                <div class="col-md-8 themed-grid-col" style="padding: 5px">
+            <h3>Фільтр</h3>
+                <div class="col-md-11 themed-grid-col" style="padding: 5px">
                     <div class="row justify-content-center">
-                        <div class="col-md-2 themed-grid-col justify-content-center">
-                            <div style="margin-top: 6px">Сортувати за</div>
+                        <div class="col-md-1 themed-grid-col">
+                            <select name="citystart" class="form-select" required>
+                                <option>Відправляємся з</option>
+                                {% for city in cities %}
+                                    <option>{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="col-md-6 themed-grid-col">
+                        <div class="col-md-1 themed-grid-col">
+                            <select name="cityfinish" class="form-select" required>
+                                <option>Їдем в</option>
+                                {% for city in cities %}
+                                    <option>{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 themed-grid-col">
                                 <select name="item_sort" class="form-select" required>
                                     <option>Назва автобусу</option>
                                     <option>За іменем міста відправлення</option>
@@ -51,16 +97,24 @@
                                     <option>За часом прибуття</option>
                                 </select>
                         </div>
-                        <div class="col-md-3 themed-grid-col">
+                        <div class="col-md-2 themed-grid-col">
                             <select name="direction" class="form-select" required>
                                     <option>По спаданню</option>
                                     <option>По зростанню</option>
                             </select>
                         </div>
+                        <div class="col-md-1 themed-grid-col" >Відправлення від</div>
+                        <div class="col-md-2 themed-grid-col">
+                            <input class="form-select" type="datetime-local" name="starttime" id="startinput">
+                        </div>
+                        <div class="col-md-1 themed-grid-col" style="margin-top: 6px">До</div>
+                        <div class="col-md-2 themed-grid-col">
+                            <input class="form-select" type="datetime-local" name="finishtime" id="finishinput">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4 themed-grid-col" style="padding: 5px">
-                    <button class="btn btn-primary" type="submit" id="btn_sort" onclick="redirectToSelect()">Застосувати фільтр</button>
+                <div class="col-md-1 themed-grid-col" style="padding: 5px">
+                    <button class="btn btn-primary" type="submit" id="btn_sort" onclick="redirectToSelect()">Фільтрувати</button>
                 </div>
             </div>
         </form>
@@ -80,6 +134,7 @@
                         <th scope="col">Місто прибуття</th>
                         <th scope="col">Час відправлення</th>
                         <th scope="col">Час прибуття</th>
+                        <th scope="col">Замовити</th>
                     </tr>
                 </thead>
 
@@ -110,6 +165,7 @@
                         </td>
                         <td>{{ journey.time_start }}</td>
                         <td>{{ journey.time_finish }}</td>
+                        <td><a class="btn btn-primary" href="/buyticket">Купити</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -133,6 +189,7 @@
                         <th scope="col">Місто прибуття</th>
                         <th scope="col">Час відправлення</th>
                         <th scope="col">Час прибуття</th>
+                        <th scope="col">Замовити</th>
                     </tr>
                 </thead>
 
@@ -151,6 +208,9 @@
                         </td>
                         <td>{{ tab.time_start }}</td>
                         <td>{{ tab.time_finish }}</td>
+                        <td>
+                            <a class="btn btn-primary" href="/buyticket">Купити</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
