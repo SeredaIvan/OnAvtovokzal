@@ -22,7 +22,7 @@ class DbContext:
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         result = []
-
+        print(query)
         for row in rows:
             instance = other_class_instance.__class__()
             for idx, item in enumerate(array_items):

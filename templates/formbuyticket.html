@@ -1,0 +1,243 @@
+{% extends 'buyticket.html' %}
+{% block form %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form</title>
+</head>
+<body>
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('input[name="phone"]').addEventListener('input', function () {
+            phoneValid()
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('input[name="finishtime"]').addEventListener('change', function () {
+            timeValid()
+        })
+    })
+
+    function timeValid(){
+        let timestart = document.querySelector('input[name="starttime"]')
+        let timefinish = document.querySelector('input[name="finishtime"]')
+        if ( timefinish.value > timestart.value) {
+            timefinish.style.border = "solid 2px green"
+        }
+        else {
+            timefinish.style.border = "solid 2px red";
+        }
+    }
+
+    function phoneValid(event=""){
+        let phone=document.querySelector('input[name="phone"]')
+        let phoneNumber = phone.value
+
+        if (phoneNumber.length === 10) {
+            phone.style.border = "2px solid green";
+            //redirectToSelect()
+        }
+        else {
+            phone.style.border = "2px solid red";
+            let labphone = document.getElementById('labphone');
+            labphone.innerHTML = "Введіть коректний номер";
+            event.preventDefault()
+        }
+        console.log(phoneNumber)
+    }
+
+    async function redirectToSelect() {
+        const citystart = document.querySelector('select[name="citystart"]').value;
+        const cityfinish = document.querySelector('select[name="cityfinish"]').value;
+        const starttime = document.querySelector('select[name="starttime"]').value;
+        const finishtime = document.querySelector('select[name="finishtime"]').value;
+        const name = document.querySelector('select[name="name"]').value;
+        const phone = document.querySelector('select[name="phone"]').value;
+
+        const formData = new FormData();
+        formData.append('item_sort', name);
+        formData.append('direction', phone);
+        formData.append('citystart', citystart);
+        formData.append('cityfinish', cityfinish);
+        formData.append('starttime', starttime);
+        formData.append('finishtime', finishtime);;
+
+        try {
+            const response = await fetch('/formbuyticket', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+
+                window.location.href='/journeys';
+                window.location.reload();
+            }
+            else {
+                console.error('Помилка при відправці POST-запиту');
+            }
+        } catch (error) {
+            console.error('Помилка при виконанні fetch:', error);
+        }
+    }
+    </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9hOcqXCKQ9PCEYOwzO2r-n1_3aU_p8Do&libraries=places"></script>
+    <script>
+
+        let citystart;
+        let cityfinish;
+        let citylist = [];
+
+        {% for city in cities %}
+            citylist.push({
+                name: "{{ city.name }}",
+                country: "{{ city.country }}"
+            });
+        {% endfor %}
+
+        console.log(citylist);
+        document.addEventListener('DOMContentLoaded',function (){
+            document.querySelector('select[name="citystart"]').addEventListener('change', function() {
+                console.log("strrt")
+                setCities()
+            });
+            document.querySelector('select[name="cityfinish"]').addEventListener('change', function() {
+                console.log("finish")
+                setCities()
+            });
+
+        })
+
+        function setCities(){
+             citystart=document.querySelector('select[name="citystart"]').value
+             cityfinish=document.querySelector('select[name="cityfinish"]').value
+
+
+
+            if (citystart!="Відправляємся з" && cityfinish!="Їдем в") {
+                console.log("Обидва міста вибрані:", citystart, cityfinish);
+                let googlemap = document.querySelector('div[id="googlemap"]')
+                googlemap.style.display="block"
+                initMap()
+            }
+        }
+
+        function initMap() {
+          let map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 37.7749, lng: -122.4194},
+            zoom: 13
+          });
+
+          var directionsService = new google.maps.DirectionsService();
+          var directionsRenderer = new google.maps.DirectionsRenderer({map: map});
+
+          calculateAndDisplayRoute(directionsService, directionsRenderer);
+        }
+
+        function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+
+            let or = citystart+", "+ citylist[citystart]
+            let dest = cityfinish+", "+ citylist[cityfinish]
+          directionsService.route(
+            {
+
+              origin:  or,
+              destination:  dest,
+              travelMode: 'DRIVING'
+            },
+            function(response, status) {
+              if (status === 'OK') {
+                directionsRenderer.setDirections(response);
+
+
+                var route = response.routes[0];
+                var durationInSeconds = 0;
+
+                for (var i = 0; i < route.legs.length; i++) {
+                  durationInSeconds += route.legs[i].duration.value;
+                }
+
+                var hours = Math.floor(durationInSeconds / 3600);
+                var minutes = Math.floor((durationInSeconds % 3600) / 60);
+
+                var travelTimeInfo = document.getElementById('travel-time');
+                travelTimeInfo.textContent = 'Приблизний час подорожі : ' + hours + ' годин ' + minutes + ' хвилин';
+              } else {
+                window.alert('Не вдалося розрахувати маршрут через: ' + status);
+              }
+            }
+          );
+        }
+      </script>
+    {% if user is none %}
+        <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
+            <form class="text-center"  method="GET">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="inpname" name="name" required>
+                    <label for="inpname">Введіть ім'я клієнта</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="inpphone" name="phone" required>
+                    <label id="labphone" for="inpname">Введіть телефон клієнта</label>
+                </div>
+    {% else %}
+        <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
+            <form class="text-center"  method="GET">
+    {% endif %}
+
+            <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
+                <div class="row text-center">
+                    <h3>Замовити квиток</h3>
+                    <div class="col-md-12 themed-grid-col" style="padding: 5px">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 themed-grid-col">
+                                <select name="citystart" class="form-select" required>
+                                    <option>Відправляємся з</option>
+                                    {% for city in cities %}
+                                        <option>{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 themed-grid-col">
+                                <select name="cityfinish" class="form-select" required>
+                                    <option>Їдем в</option>
+                                    {% for city in cities %}
+                                        <option>{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12 themed-grid-col" style="padding: 5px">
+                            <div class="row justify-content-center">
+                                <div class="col-md-2 themed-grid-col" style="margin-top: 6px">Відправлення від</div>
+                                <div class="col-md-4 themed-grid-col">
+                                    <input class="form-select" type="datetime-local" name="starttime" id="startinput" required>
+                                </div>
+                                <div class="col-md-2 themed-grid-col" style="margin-top: 6px">До</div>
+                                <div class="col-md-4 themed-grid-col">
+                                    <input class="form-select" type="datetime-local" name="finishtime" id="finishinput" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="googlemap" class="align-items-cente" style="display: none">
+
+                            <div id="map" style="height: 400px;"></div>
+                            <div id="travel-time"></div>
+
+                        </div>
+                        <div class="align-items-cente">
+                            <button type="submit" class="btn btn-primary" style="padding-left: 50px;padding-right: 50px" onclick="phoneValid(event)">Купити</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+</body>
+</html>
+{% endblock %}

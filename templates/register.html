@@ -56,7 +56,7 @@
   });
 
   document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('floatingInputPhone').addEventListener('blur', function () {
+    document.getElementById('floatingInputPhone').addEventListener('change', function () {
 
       if (this.value.length<=11||this.value.match(/[a-zA-ZА-Яа-я]/)) {
         let labphone = document.getElementById('labphone');

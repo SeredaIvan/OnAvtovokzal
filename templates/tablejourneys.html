@@ -1,0 +1,51 @@
+{% extends 'buyticket.html' %}
+
+{% block table %}
+<body>
+
+    {% if table is not none %}
+        <div class="bd-example-snippet bd-code-snippet">
+        <div class="bd-example m-0 border-0" style="margin-top: 50px !important;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Автобус</th>
+                        <th scope="col">Місто відправлення</th>
+                        <th scope="col">Місто прибуття</th>
+                        <th scope="col">Час відправлення</th>
+                        <th scope="col">Час прибуття</th>
+                        <th scope="col">Замовити</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in table %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>
+                            {{ row.bus_name }}
+                        </td>
+                        <td>
+                            {{ row.start_city }}
+                        </td>
+                        <td>
+                            {{ row.finish_city }}
+                        </td>
+                        <td>{{ row.time_start }}</td>
+                        <td>{{ row.time_finish }}</td>
+                        <td>{{ row.cost }}</td>
+                        <td>
+                            <a class="btn btn-primary" >Купити</a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+

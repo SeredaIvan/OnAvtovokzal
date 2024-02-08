@@ -165,7 +165,20 @@
                         </td>
                         <td>{{ journey.time_start }}</td>
                         <td>{{ journey.time_finish }}</td>
-                        <td><a class="btn btn-primary" href="/buyticket">Купити</a></td>
+                        <td>
+                            <a class="btn btn-primary" href="#">Купити</a>
+                            <!--
+                            <form id="buyTicketForm" action="" method="post" style="display: none;">
+                                <input type="hidden" name="citystart" value="{{ citystart }}">
+                                <input type="hidden" name="cityfinish" value="{{ cityfinish }}">
+                            </form>
+                            <script>
+                                function submitForm() {
+                                    document.getElementById('buyTicketForm').submit();
+                                }
+                            </script>
+                            -->
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -175,9 +188,7 @@
     </div>
     {% endif %}
     {% if table is not none %}
-        <script>
-            //alert('2')
-        </script>
+
         <div class="bd-example-snippet bd-code-snippet">
         <div class="bd-example m-0 border-0">
             <table class="table table-striped">

@@ -15,6 +15,49 @@ app.secret_key = os.urandom(24)
 db_context = DbContext()
 
 
+@app.route('/buyticket/', methods=['GET','POST'])
+def buyticket():
+    if request.method == "POST":
+        return redirect("/home")
+    return redirect("/formbuyticket")
+
+@app.route('/formbuyticket', methods=['GET','POST'])
+def formbuyticket():
+    if request.method=="GET":
+        if (request.args.get('citystart') and request.args.get('cityfinish')
+                and request.args.get('name') and request.args.get('phone')
+                and request.args.get('starttime') and request.args.get('finishtime')):
+            query = (
+            f"SELECT timetable.id_journey,buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish ,timetable.cost FROM timetable "
+            f"JOIN cities AS start_city ON timetable.city_start_id = start_city.id_city "
+            f"JOIN cities AS finish_city ON timetable.city_finish_id = finish_city.id_city "
+            f"JOIN buses ON timetable.bus_id = buses.id_bus ")
+            if request.args.get('citystart') == "Відправляємся з":
+                pass
+            elif request.args.get('citystart'):
+                citystart = request.args.get('citystart')
+                query += f" WHERE start_city.name LIKE '{citystart}'"
+            if request.args.get('cityfinish') == "Їдем в":
+                pass
+            elif request.args.get('cityfinish'):
+                cityfinish = request.args.get('cityfinish')
+                query += f" AND finish_city.name LIKE '{cityfinish}'"
+            if request.args.get('starttime') and request.args.get('finishtime'):
+                starttime = request.args.get('starttime')
+                finishtime = request.args.get('finishtime')
+                starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M')
+                finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M')
+                query += f" AND timetable.time_start BETWEEN '{starttime}' AND '{finishtime}'"
+            table = db_context.get_items(JourneysTable(), newquery=query)
+            if table is not None:
+                return render_template("tablejourneys.html", user=GetFromDict(), table=table)
+        else:
+            cities = db_context.get_items(Cities())
+            return render_template("formbuyticket.html", user=GetFromDict(), cities=cities)
+
+    cities = db_context.get_items(Cities())
+    return render_template("formbuyticket.html", user=GetFromDict(), cities=cities)
+
 @app.route('/journeys', methods=['GET','POST'])
 def journeys():
     try:
@@ -23,7 +66,7 @@ def journeys():
             item_sort = request.args.get('item_sort')
             direction = request.args.get('direction')
             query = (
-                f"SELECT buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish FROM timetable "
+                f"SELECT timetable.id_journey,buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish,timetable.cost FROM timetable "
                 f"JOIN cities AS start_city ON timetable.city_start_id = start_city.id_city "
                 f"JOIN cities AS finish_city ON timetable.city_finish_id = finish_city.id_city "
                 f"JOIN buses ON timetable.bus_id = buses.id_bus ")
@@ -98,7 +141,7 @@ def loginselect():
 
 @app.route('/login/<data>',methods=['GET','POST'])
 def login(data):
-    if request.method == "POST" :
+    if request.method == "POST":
         item=str(data)
         password= request.form['floatingPassword']
         if data == "email":
@@ -119,6 +162,7 @@ def login(data):
         return render_template('login.html', data=data, user=None,info="")
     else:
         return redirect("/home")
+
 
 @app.route('/register' ,methods=['POST','GET'])
 def register():
