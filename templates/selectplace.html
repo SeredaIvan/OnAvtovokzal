@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}
+    Вибрати місце
+{% endblock %}
+{% block body %}
+    <style>
+        .maindiv {
+            display: inline-block;
+            margin-top: 100px;
+            width: 100%;
+            background-color: white;
+        }
+
+        .bus {
+            margin-top: 50px;
+            margin-bottom: 50px;
+            margin-left: 30%;
+            margin-right: 30%;
+            background-color: darkgray;
+            border: 3px solid grey;
+            border-radius: 20px;
+            padding: 50px;
+            padding-top: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .bus>div {
+            margin: 20px;
+            width: 100px;
+            height: 100px;
+            background-color: #0D6EFD;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            cursor: pointer; /* Додаємо курсор підказку на клацання */
+        }
+
+        .bus>div:nth-child(3n) {
+            margin-left: 70px;
+        }
+
+        .bus>div:hover {
+            border: 3px solid #0a58ca;
+            box-shadow: 5px 5px #0D6EFD;
+            background-color: #0a58ca;
+        }
+
+        .doesnt-select {
+            background-color: grey !important;
+            color: white !important;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var forms = document.querySelectorAll('form');
+
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    var formData = new FormData(form);
+
+                    fetch('/pay/', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.text();
+                            } else {
+                                console.error('Помилка: ' + response.status);
+                            }
+                        })
+                        .then(html => {
+                            document.body.innerHTML = html;
+                        })
+                        .catch(error => {
+                            console.error('Помилка виконання запиту:', error);
+                        });
+                });
+            });
+        });
+
+
+
+    </script>
+    <div class="maindiv text-center">
+        <h2>Виберіть квиток</h2>
+        <h3>{{ bus.name }}</h3>
+        <div><span style="color: grey">{{ countstickets }}/{{ bus.seats }}</span></div>
+        <div class="bus">
+            {% set indexticket = 0 %}
+            {% for seat in range(bus.seats) %}
+                {% set index = loop.index %}
+                {% if index in greyseats %}
+                    <div class="doesnt-select" data-seat="{{ index }}">{{ index }}</div>
+                    {% set indexticket = indexticket + 1 %}
+                {% else %}
+                    <div class="selectable-seat" data-seat="{{ index }}" onclick="selectDiv(this)">{{ index }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <form method="post">
+            {% if non_auth_user is not none %}
+                <input type="hidden" name="phone" value="{{ non_auth_user.phone }}">
+                <input type="hidden" name="name" value="{{ non_auth_user.name }}">
+            {% endif %}
+            <input type="hidden" name="id_journey" value="{{ journey.id_journey }}">
+            <input type="hidden" name="seat" value="">
+            <h4 id="labelseat">Ви вибрали місце : </h4>
+            <button class="btn btn-primary" name="butsub">Перейти до оплати</button>
+        </form>
+    </div>
+{% endblock %}

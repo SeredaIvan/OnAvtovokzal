@@ -49,41 +49,6 @@
         }
         console.log(phoneNumber)
     }
-
-    async function redirectToSelect() {
-        const citystart = document.querySelector('select[name="citystart"]').value;
-        const cityfinish = document.querySelector('select[name="cityfinish"]').value;
-        const starttime = document.querySelector('select[name="starttime"]').value;
-        const finishtime = document.querySelector('select[name="finishtime"]').value;
-        const name = document.querySelector('select[name="name"]').value;
-        const phone = document.querySelector('select[name="phone"]').value;
-
-        const formData = new FormData();
-        formData.append('item_sort', name);
-        formData.append('direction', phone);
-        formData.append('citystart', citystart);
-        formData.append('cityfinish', cityfinish);
-        formData.append('starttime', starttime);
-        formData.append('finishtime', finishtime);;
-
-        try {
-            const response = await fetch('/formbuyticket', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-
-                window.location.href='/journeys';
-                window.location.reload();
-            }
-            else {
-                console.error('Помилка при відправці POST-запиту');
-            }
-        } catch (error) {
-            console.error('Помилка при виконанні fetch:', error);
-        }
-    }
     </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9hOcqXCKQ9PCEYOwzO2r-n1_3aU_p8Do&libraries=places"></script>
     <script>
@@ -230,7 +195,7 @@
 
                         </div>
                         <div class="align-items-cente">
-                            <button type="submit" class="btn btn-primary" style="padding-left: 50px;padding-right: 50px" onclick="phoneValid(event)">Купити</button>
+                            <button type="submit" class="btn btn-primary" style="padding-left: 50px;padding-right: 50px" onclick="phoneValid(event)">Знайти</button>
                         </div>
 
                     </div>

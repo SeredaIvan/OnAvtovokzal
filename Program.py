@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template,request,session,redirect,abort
+from flask import Flask, render_template,request,session,redirect,abort,url_for
 from dbcontext import DbContext
 from ClassLib.buses import Buses
 from ClassLib.cities import Cities
@@ -7,6 +7,7 @@ from ClassLib.clients import Clients
 from ClassLib.tickets import Tickets
 from ClassLib.timetable import Timetable
 from ClassLib.journeystable import JourneysTable
+from ClassLib.non_autorized_users import Non_autorized_users
 from datetime import datetime
 
 app = Flask(__name__)
@@ -25,7 +26,6 @@ def buyticket():
 def formbuyticket():
     if request.method=="GET":
         if (request.args.get('citystart') and request.args.get('cityfinish')
-                and request.args.get('name') and request.args.get('phone')
                 and request.args.get('starttime') and request.args.get('finishtime')):
             query = (
             f"SELECT timetable.id_journey,buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish ,timetable.cost FROM timetable "
@@ -50,19 +50,92 @@ def formbuyticket():
                 query += f" AND timetable.time_start BETWEEN '{starttime}' AND '{finishtime}'"
             table = db_context.get_items(JourneysTable(), newquery=query)
             if table is not None:
-                return render_template("tablejourneys.html", user=GetFromDict(), table=table)
+                if request.args.get('name') and request.args.get('phone'):
+                    non_auth_user=Non_autorized_users()
+                    non_auth_user.name=request.args.get('name')
+                    non_auth_user.phone=request.args.get('phone')
+                    return render_template("tablejourneys.html", user=GetFromDict(), table=table,non_auth_user=non_auth_user)
+                else:
+                    return render_template("tablejourneys.html", user=GetFromDict(), table=table,non_auth_user=None)
         else:
             cities = db_context.get_items(Cities())
             return render_template("formbuyticket.html", user=GetFromDict(), cities=cities)
 
+
     cities = db_context.get_items(Cities())
     return render_template("formbuyticket.html", user=GetFromDict(), cities=cities)
+
+
+@app.route("/tablejourneys",methods=['GET','POST'])
+def tablejourneys():
+    pass
+
+
+@app.route('/selectplace/', methods=['POST'])
+def selectplace():
+    if request.method == "POST":
+        phone = request.form.get('phone')
+        name = request.form.get('name')
+        id_journey = request.form.get('id_journey')
+        bus_name = request.form.get('bus_name')
+        start_city = request.form.get('start_city')
+        finish_city = request.form.get('finish_city')
+        time_start = request.form.get('time_start')
+        time_finish = request.form.get('time_finish')
+        cost = request.form.get('cost')
+        bus=Buses()
+        bus = db_context.get_item_by_other_value(bus,'name',bus_name)
+        journey=Timetable()
+        journey=db_context.get_item_by_id(journey,id_journey)
+        tickets = list
+        query=f"SELECT * FROM tickets WHERE tickets.id_journey Like {id_journey}"
+        tickets=db_context.get_items(Tickets(),newquery=query)
+        countstickets=len(tickets)
+        greyseats=[]
+        for ticket in tickets:
+            for seat in range(bus.seats):
+                if ticket.seat == seat:
+                    greyseats.append(seat)
+        non_auth_user=Non_autorized_users()
+        non_auth_user.phone=phone
+        non_auth_user.name=name
+
+        if phone and name :
+            return render_template("selectplace.html",user=GetFromDict(), non_auth_user=non_auth_user, bus=bus, journey = journey,
+                               start_city=start_city, finish_city=finish_city, tickets=tickets,countstickets=countstickets,greyseats=greyseats)
+        else:
+            return render_template("selectplace.html",user=GetFromDict(), id_journey=id_journey, bus_name=bus_name,
+                               start_city=start_city, finish_city=finish_city, time_start=time_start,
+                               time_finish=time_finish, cost=cost)
+
+@app.route('/pay/', methods=['POST'])
+def pay():
+    if request.method=="POST":
+        id_journey = request.form.get('id_journey')
+        seat = request.form.get('seat')
+        if request.form.get('phone') and request.form.get('name'):
+            phone = request.form.get('phone')
+            name = request.form.get('name')
+        else:
+            user=GetFromDict()
+
+        journey = Timetable()
+        journey = db_context.get_item_by_id(journey, id_journey)
+
+        start_city=Cities()
+        finish_city=Cities()
+
+        start_city=db_context.get_item_by_id(start_city, journey.city_start_id)
+        finish_city=db_context.get_item_by_id(finish_city, journey.city_finish_id)
+
+
 
 @app.route('/journeys', methods=['GET','POST'])
 def journeys():
     try:
         if ((request.args.get('item_sort') and request.args.get('direction') and request.args.get('citystart')) or
-                (request.args.get('citystart') and request.args.get('cityfinish'))):
+                (request.args.get('citystart') and request.args.get('cityfinish')) or
+                (request.args.get('item_sort') and request.args.get('direction') and request.args.get('citystart')and request.args.get('cityfinish'))):
             item_sort = request.args.get('item_sort')
             direction = request.args.get('direction')
             query = (
@@ -256,6 +329,7 @@ def addjourney():
         journey.cost = float(request.form['cost'])
         journey.time_start = datetime.strptime(request.form['timestart'], '%Y-%m-%dT%H:%M')
         journey.time_finish = datetime.strptime(request.form['timefinish'], '%Y-%m-%dT%H:%M')
+        journey.seats_occupied=int(request.form['seats_occupied'])
         cities = db_context.get_items(Cities())
         buses = db_context.get_items(Buses())
         if db_context.add_item(journey):

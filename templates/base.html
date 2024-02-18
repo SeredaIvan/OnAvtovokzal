@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+<script>
+    function selectDiv(div) {
+    var seatNumber = div.getAttribute('data-seat'); // Отримуємо номер місця
+
+    // Запис номеру місця у поле input
+    var seatInput = document.querySelector('input[name="seat"]');
+    seatInput.value = seatNumber;
+
+    // Зміна кольору обраних та невибраних місць
+    var busDivs = document.querySelectorAll('.bus > div');
+    busDivs.forEach(function (element) {
+        if (element.getAttribute('data-seat') === seatNumber) {
+            element.style.boxShadow='10px 10px 5px #0D6EFD'
+            element.style.backgroundColor = '#0a58ca';
+            element.style.color = 'white';
+            let labelseat =document.getElementById('labelseat')
+            labelseat.innerHTML='Ви вибрали місце : ' + seatInput.value
+
+        } else {
+            element.style.backgroundColor = '#0D6EFD';
+            element.style.color = 'white';
+            element.style.boxShadow=''
+        }
+    });
+}
+</script>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -1,6 +1,8 @@
 import pyodbc
 from ClassLib.buses import Buses
 from ClassLib.clients import Clients
+from ClassLib.tickets import Tickets
+
 from ClassLib.timetable import Timetable
 
 
@@ -14,8 +16,6 @@ class DbContext:
         table = other_class_instance.__class__.__name__
         query = f"SELECT {', '.join(array_items)} FROM {table}"
 
-
-
         if newquery!="":
             query=newquery
             print(query)
@@ -27,6 +27,7 @@ class DbContext:
             instance = other_class_instance.__class__()
             for idx, item in enumerate(array_items):
                 value = row[idx]
+                print(value)
                 setattr(instance, item, value if value is not None else "")
             result.append(instance)
         print("Item Get succes")
@@ -100,8 +101,8 @@ class DbContext:
         table = other_class_instance.__class__.__name__
 
         query = f"SELECT * FROM {table} WHERE {item} = ?"
-
         self.cursor.execute(query, (value,))
+
         row = self.cursor.fetchone()
 
         if row:
@@ -175,5 +176,8 @@ class DbContext:
             print(f"Error deleting record: {e}")
 
 
-
-
+db_context=DbContext()
+tickets = list
+query=f"SELECT * FROM tickets WHERE tickets.id_journey Like 2"
+tickets=db_context.get_items(Tickets(),newquery=query)
+print(tickets[0].seat)

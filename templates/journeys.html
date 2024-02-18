@@ -10,55 +10,99 @@
         justify-content: center;
     }
     </style>
-    <script>
-    async function redirectToSelect() {
-    const itemSort = document.querySelector('select[name="item_sort"]').value;
-    const direction = document.querySelector('select[name="direction"]').value;
-    const citystart = document.querySelector('select[name="citystart"]').value;
-    if (document.querySelector('input[name="cityfinish"]').value){
-        const cityfinish = document.querySelector('select[name="cityfinish"]').value;
-    }
-    if (document.querySelector('input[name="starttime"]').value){
-        const starttime = document.querySelector('select[name="starttime"]').value;
-    }
-    if (document.querySelector('input[name="finishtime"]').value){
-        const finishtime = document.querySelector('select[name="finishtime"]').value;
-    }
-    //alert("POST")
-    const formData = new FormData();
-    formData.append('item_sort', itemSort);
-    formData.append('direction', direction);
-    formData.append('citystart', citystart);
-    if (document.querySelector('input[name="cityfinish"]').value){
-        formData.append('cityfinish', cityfinish);
-    }
-    if (document.querySelector('input[name="starttime"]').value){
-        formData.append('starttime', starttime);
-    }
-    if (document.querySelector('input[name="finishtime"]').value){
-        formData.append('finishtime', finishtime);;
-    }
-    try {
-        const response = await fetch('/journeys', {
-            method: 'POST',
-            body: formData
-        });
+    <!--<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Отримуємо всі форми на сторінці
+        var forms = document.querySelectorAll('form');
 
-        if (response.ok) {
-            // Перезавантаження сторінки після успішної відправки POST-запиту
-            window.location.href='/journeys';
-            window.location.reload();
-        } else {
-            // Обробка помилок
-            console.error('Помилка при відправці POST-запиту');
-        }
-    } catch (error) {
-        console.error('Помилка при виконанні fetch:', error);
+        // Додаємо обробник подій для кожної форми
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(form);
+
+                fetch('/selectplace/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        console.error('Помилка: ' + response.status);
+                    }
+                })
+                .then(html => {
+                    // Оновлюємо вміст поточної сторінки з отриманим HTML
+                    document.body.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Помилка виконання запиту:', error);
+                });
+            });
+        });
+    });
+</script>-->
+    <script>
+    function submitForm(index) {
+        let nameForm="buyTicketForm"+ ind.toString()
+        //if starttime
+        document.getElementById('buyTicketForm').submit();
     }
-}
+
+    async function redirectToSelect() {
+        const itemSort = document.querySelector('select[name="item_sort"]').value;
+        const direction = document.querySelector('select[name="direction"]').value;
+        const citystart = document.querySelector('select[name="citystart"]').value;
+        if (document.querySelector('input[name="cityfinish"]').value){
+            const cityfinish = document.querySelector('select[name="cityfinish"]').value;
+        }
+        if (document.querySelector('input[name="starttime"]').value){
+            const starttime = document.querySelector('select[name="starttime"]').value;
+            let hiddinpstarttime=document.querySelector('input[name="starttime"]')
+            hiddinpstarttime.value=starttime
+        }
+        if (document.querySelector('input[name="finishtime"]').value){
+            const finishtime = document.querySelector('select[name="finishtime"]').value;
+            let hiddinpfinishtime=document.querySelector('input[name="finishtime"]')
+            hiddinpfinishtime.value=finishtime
+        }
+        //alert("POST")
+        const formData = new FormData();
+        formData.append('item_sort', itemSort);
+        formData.append('direction', direction);
+        formData.append('citystart', citystart);
+        if (document.querySelector('input[name="cityfinish"]').value){
+            formData.append('cityfinish', cityfinish);
+        }
+        if (document.querySelector('input[name="starttime"]').value){
+            formData.append('starttime', starttime);
+        }
+        if (document.querySelector('input[name="finishtime"]').value){
+            formData.append('finishtime', finishtime);
+        }
+        try {
+            const response = await fetch('/journeys', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Перезавантаження сторінки після успішної відправки POST-запиту
+                window.location.href='/journeys';
+                window.location.reload();
+            } else {
+                // Обробка помилок
+                console.error('Помилка при відправці POST-запиту');
+            }
+        } catch (error) {
+            console.error('Помилка при виконанні fetch:', error);
+        }
+    }
 
 </script>
-    <div class=" text-center bg-body-secondary">
+    <div class=" text-center bg-body-secondary" style="margin-top: 25px !important;">
         <div class="container py-3">
             <h1>Розклад всіх автобусів</h1>
         </div>
@@ -134,6 +178,7 @@
                         <th scope="col">Місто прибуття</th>
                         <th scope="col">Час відправлення</th>
                         <th scope="col">Час прибуття</th>
+                        <th scope="col">Ціна</th>
                         <th scope="col">Замовити</th>
                     </tr>
                 </thead>
@@ -165,19 +210,23 @@
                         </td>
                         <td>{{ journey.time_start }}</td>
                         <td>{{ journey.time_finish }}</td>
+                        <td>{{ journey.cost }}</td>
                         <td>
-                            <a class="btn btn-primary" href="#">Купити</a>
-                            <!--
-                            <form id="buyTicketForm" action="" method="post" style="display: none;">
+                            {% if user is not none %}
+                            <a class="btn btn-primary" onclick="submitForm({{ loop.index }})">Купити</a>
+                            {% endif %}
+                            {% if user is none %}
+                            <a class="btn btn-primary" href="/loginselect">Ввійти</a>
+                            {% endif %}
+
+                            <form id="buyTicketForm{{ loop.index }}" action="" method="post" style="display: none;">
                                 <input type="hidden" name="citystart" value="{{ citystart }}">
                                 <input type="hidden" name="cityfinish" value="{{ cityfinish }}">
+                                <input type="hidden" name="starttime" value="">
+                                <input type="hidden" name="finishtime" value="">
                             </form>
-                            <script>
-                                function submitForm() {
-                                    document.getElementById('buyTicketForm').submit();
-                                }
-                            </script>
-                            -->
+
+
                         </td>
                     </tr>
                     {% endfor %}
@@ -200,6 +249,7 @@
                         <th scope="col">Місто прибуття</th>
                         <th scope="col">Час відправлення</th>
                         <th scope="col">Час прибуття</th>
+                        <th scope="col">Ціна</th>
                         <th scope="col">Замовити</th>
                     </tr>
                 </thead>
@@ -219,8 +269,14 @@
                         </td>
                         <td>{{ tab.time_start }}</td>
                         <td>{{ tab.time_finish }}</td>
+                        <td>{{ tab.cost }}</td>
                         <td>
-                            <a class="btn btn-primary" href="/buyticket">Купити</a>
+                            {% if user is not none %}
+                            <a class="btn btn-primary" onclick="">Купити</a>
+                            {% endif %}
+                            {% if user is none %}
+                            <a class="btn btn-primary" href="/loginselect">Ввійти</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

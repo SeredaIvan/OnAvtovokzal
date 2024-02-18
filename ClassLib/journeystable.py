@@ -7,3 +7,6 @@ class JourneysTable:
         self.time_start = None
         self.time_finish = None
         self.cost = None
+
+    def getJourneyId(self):
+        return self.id_journey

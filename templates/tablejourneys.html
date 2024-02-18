@@ -1,8 +1,38 @@
 {% extends 'buyticket.html' %}
 
-{% block table %}
+{% block form %}
 <body>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('form');
 
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(form);
+
+                fetch('/selectplace/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        console.error('Помилка: ' + response.status);
+                    }
+                })
+                .then(html => {
+                    document.body.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Помилка виконання запиту:', error);
+                });
+            });
+        });
+    });
+</script>
     {% if table is not none %}
         <div class="bd-example-snippet bd-code-snippet">
         <div class="bd-example m-0 border-0" style="margin-top: 50px !important;">
@@ -15,37 +45,56 @@
                         <th scope="col">Місто прибуття</th>
                         <th scope="col">Час відправлення</th>
                         <th scope="col">Час прибуття</th>
+                        <th scope="col">Ціна</th>
                         <th scope="col">Замовити</th>
                     </tr>
                 </thead>
 
                 <tbody>
+
                     {% for row in table %}
                     <tr>
-                        <th scope="row">{{ loop.index }}</th>
-                        <td>
-                            {{ row.bus_name }}
-                        </td>
-                        <td>
-                            {{ row.start_city }}
-                        </td>
-                        <td>
-                            {{ row.finish_city }}
-                        </td>
-                        <td>{{ row.time_start }}</td>
-                        <td>{{ row.time_finish }}</td>
-                        <td>{{ row.cost }}</td>
-                        <td>
-                            <a class="btn btn-primary" >Купити</a>
-
-                        </td>
+                        <form method="post">
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>
+                                {{ row.bus_name }}
+                            </td>
+                            <td>
+                                {{ row.start_city }}
+                            </td>
+                            <td>
+                                {{ row.finish_city }}
+                            </td>
+                            <td>
+                                {{ row.time_start }}
+                            </td>
+                            <td>
+                                {{ row.time_finish }}
+                            </td>
+                            <td>
+                                {{ row.cost }}
+                            </td>
+                            <td>
+                                {% if non_auth_user is not none %}
+                                <input type="hidden" name="phone" value="{{ non_auth_user.phone }}">
+                                <input type="hidden" name="name" value="{{ non_auth_user.name }}">
+                                {% endif %}
+                                <input type="hidden" name="id_journey" value="{{ row.id_journey }}">
+                                <input type="hidden" name="bus_name" value="{{ row.bus_name }}">
+                                <input type="hidden" name="start_city" value="{{ row.start_city }}">
+                                <input type="hidden" name="finish_city" value="{{ row.finish_city }}">
+                                <input type="hidden" name="time_start" value="{{ row.time_start }}">
+                                <input type="hidden" name="time_finish" value="{{ row.time_finish }}">
+                                <input type="hidden" name="cost" value="{{ row.cost }}">
+                                <button type="submit" class="btn btn-primary" >Купити</button>
+                            </td>
+                        </form>
                     </tr>
                     {% endfor %}
+
                 </tbody>
             </table>
         </div>
         </div>
     {% endif %}
 {% endblock %}
-
-

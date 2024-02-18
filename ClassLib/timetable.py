@@ -9,3 +9,7 @@ class Timetable:
         self.cost = None
         self.time_start = None
         self.time_finish = None
+        self.seats_occupied=None
+
+    def getBusId(self):
+       return self.id_journey
