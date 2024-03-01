@@ -6,6 +6,7 @@ from ClassLib.cities import Cities
 from ClassLib.clients import Clients
 from ClassLib.tickets import Tickets
 from ClassLib.timetable import Timetable
+from ClassLib.orders import Orders
 from ClassLib.journeystable import JourneysTable
 from ClassLib.non_autorized_users import Non_autorized_users
 from datetime import datetime
@@ -74,60 +75,149 @@ def tablejourneys():
 @app.route('/selectplace/', methods=['POST'])
 def selectplace():
     if request.method == "POST":
-        phone = request.form.get('phone')
-        name = request.form.get('name')
+        non_auth_user = None
+        if request.form.get('phone') and request.form.get('name'):
+            non_auth_user = Non_autorized_users()
+            non_auth_user.phone = request.form.get('phone')
+            non_auth_user.name = request.form.get('name')
         id_journey = request.form.get('id_journey')
         bus_name = request.form.get('bus_name')
         start_city = request.form.get('start_city')
         finish_city = request.form.get('finish_city')
-        time_start = request.form.get('time_start')
-        time_finish = request.form.get('time_finish')
-        cost = request.form.get('cost')
         bus=Buses()
         bus = db_context.get_item_by_other_value(bus,'name',bus_name)
         journey=Timetable()
         journey=db_context.get_item_by_id(journey,id_journey)
-        tickets = list
-        query=f"SELECT * FROM tickets WHERE tickets.id_journey Like {id_journey}"
-        tickets=db_context.get_items(Tickets(),newquery=query)
-        countstickets=len(tickets)
-        greyseats=[]
-        for ticket in tickets:
-            for seat in range(bus.seats):
-                if ticket.seat == seat:
-                    greyseats.append(seat)
-        non_auth_user=Non_autorized_users()
-        non_auth_user.phone=phone
-        non_auth_user.name=name
+        tickets=None
+        query=f"SELECT * FROM tickets WHERE tickets.journey_id Like {id_journey}"
+        if db_context.get_items(Tickets(),newquery=query)is not None:
+            tickets=db_context.get_items(Tickets(),newquery=query)
+        countstickets=0
+        greyseats=None
+        if tickets is not None:
+            countstickets=len(tickets)
+            greyseats=[]
+            for ticket in tickets:
+                for seat in range(bus.seats):
+                    if ticket.seat == seat:
+                        greyseats.append(seat)
 
-        if phone and name :
+        if non_auth_user is not None:
             return render_template("selectplace.html",user=GetFromDict(), non_auth_user=non_auth_user, bus=bus, journey = journey,
                                start_city=start_city, finish_city=finish_city, tickets=tickets,countstickets=countstickets,greyseats=greyseats)
         else:
-            return render_template("selectplace.html",user=GetFromDict(), id_journey=id_journey, bus_name=bus_name,
-                               start_city=start_city, finish_city=finish_city, time_start=time_start,
-                               time_finish=time_finish, cost=cost)
+            return render_template("selectplace.html",user=GetFromDict(), non_auth_user=None, bus=bus, journey = journey,
+                               start_city=start_city, finish_city=finish_city, tickets=tickets,countstickets=countstickets,greyseats=greyseats)
 
-@app.route('/pay/', methods=['POST'])
+    return redirect('/formbuyticket')
+
+@app.route('/pay/', methods=['POST', 'GET'])
 def pay():
-    if request.method=="POST":
+    if request.method == "POST":
         id_journey = request.form.get('id_journey')
         seat = request.form.get('seat')
+        non_auth_user = None
         if request.form.get('phone') and request.form.get('name'):
-            phone = request.form.get('phone')
-            name = request.form.get('name')
+            non_auth_user = Non_autorized_users()
+            non_auth_user.phone = request.form.get('phone')
+            non_auth_user.name = request.form.get('name')
         else:
-            user=GetFromDict()
+            user = GetFromDict()
 
         journey = Timetable()
         journey = db_context.get_item_by_id(journey, id_journey)
 
-        start_city=Cities()
-        finish_city=Cities()
+        bus = Buses()
+        bus = db_context.get_item_by_id(bus, journey.bus_id)
 
-        start_city=db_context.get_item_by_id(start_city, journey.city_start_id)
-        finish_city=db_context.get_item_by_id(finish_city, journey.city_finish_id)
+        start_city = Cities()
+        finish_city = Cities()
+        start_city = db_context.get_item_by_id(start_city, journey.city_start_id)
+        finish_city = db_context.get_item_by_id(finish_city, journey.city_finish_id)
 
+
+        return render_template('pay.html',user=GetFromDict(), journey=journey, bus=bus, seat=seat, start_city=start_city,
+                               finish_city=finish_city, non_auth_user=non_auth_user)
+    else:
+        return redirect('/formbuyticket')
+
+
+@app.route('/succesorder/', methods=['POST'])
+def succesorder():
+    if request.method == 'POST':
+        non_auth_user = None
+        if request.form.get('phone') and request.form.get('name'):
+            non_auth_user = Non_autorized_users()
+            non_auth_user.phone = request.form.get('phone')
+            non_auth_user.name = request.form.get('name')
+            if db_context.add_item(non_auth_user):
+                non_auth_user.id_user=db_context.select_last_index(non_auth_user)
+
+        id_journey = request.form.get('id_journey')
+        seat = request.form.get('seat')
+
+        journey = Timetable()
+        journey = db_context.get_item_by_id(journey, id_journey)
+    #створення нового ордеру
+        neworder=Orders()
+    #заповнення данних
+        if non_auth_user is None:
+            user = GetFromDict()
+            user=db_context.get_item_by_other_value(user,'email',user.email)
+            print(user.id_client)
+            neworder.client_id = user.id_client
+        else:
+            neworder.non_authorized_users_id = non_auth_user.id_user
+        neworder.date_buying = neworder.date_buying = datetime.strptime(str(datetime.utcnow().replace(microsecond=0)), '%Y-%m-%d %H:%M:%S')
+        neworder.cost = journey.cost
+
+        db_context.add_item(neworder)
+    #дістаєм id останнього ордеру
+        indexLastOrder = db_context.select_last_index(neworder)
+    #створення нового екзепляру ордера та діставання данних з БД
+        order = Orders()
+        order = db_context.get_item_by_id(order, indexLastOrder)
+    #перевірка ордерів між собою
+        if (order.client_id == neworder.client_id  and \
+                order.non_authorized_users_id == neworder.non_authorized_users_id and \
+                str(order.date_buying) == str(neworder.date_buying) and \
+                order.cost == neworder.cost):
+        #зміна статусу оплати
+            whetherpaid = db_context.update_item(order.id_order, 'whether_paid', 1, order)
+            if whetherpaid:
+                # заповнення данних квитка
+                newticket = Tickets()
+                newticket.journey_id = journey.id_journey
+                newticket.bus_id = journey.bus_id
+                newticket.order_id = order.id_order
+                newticket.client_id = order.client_id
+                newticket.date_buying = datetime.strptime(str(datetime.utcnow().replace(microsecond=0)), '%Y-%m-%d %H:%M:%S')
+                if non_auth_user is None:
+                    newticket.client_id = user.id_client
+                else:
+                    newticket.non_autorized_users_id = non_auth_user.id_user
+                newticket.seat=seat
+                iffer = db_context.add_item(newticket)
+                if iffer:
+                    bus = Buses()
+                    bus = db_context.get_item_by_id(bus, journey.bus_id)
+                    start_city = Cities()
+                    finish_city = Cities()
+                    start_city = db_context.get_item_by_id(start_city, journey.city_start_id)
+                    finish_city = db_context.get_item_by_id(finish_city, journey.city_finish_id)
+                    if iffer is None:
+                        return render_template('succesorder.html', title="Succes", user=GetFromDict(), non_auth_user=non_auth_user,
+                                               start_city=start_city,finish_city=finish_city,journey=journey, bus=bus, seat=seat, ticket=newticket)
+                    else:
+                        return render_template('succesorder.html', title="Succes",user=GetFromDict(), non_auth_user=non_auth_user,
+                                               start_city=start_city,finish_city=finish_city,journey=journey, bus=bus, seat=seat, ticket=newticket)
+                else:
+                    return render_template('succesorder.html', title=None,user=GetFromDict())
+            else:
+                pass
+        else:
+            return redirect('/formbuyticket')
+    return render_template('succesorder.html', title=None)
 
 
 @app.route('/journeys', methods=['GET','POST'])
@@ -229,7 +319,7 @@ def login(data):
             value = request.form['floatingInputPhone']
             if CreateUser(password,item, value):
                 return redirect("/home")
-            else :
+            else:
                 return render_template('login.html', data=data, user=None,info="")
     if request.method == "GET":
         return render_template('login.html', data=data, user=None,info="")
@@ -288,7 +378,6 @@ def addbus():
         bus.name=str(request.form['nameBus'])
         bus.seats=str(request.form['seats'])
         bus.bus_number=str(request.form['busNumber'])
-        bus.seats_occupied=0
         if db_context.add_item(bus):
             return render_template("addbus.html", info=None)
         else:

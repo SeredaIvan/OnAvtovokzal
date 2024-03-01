@@ -78,6 +78,9 @@
                                 {% if non_auth_user is not none %}
                                 <input type="hidden" name="phone" value="{{ non_auth_user.phone }}">
                                 <input type="hidden" name="name" value="{{ non_auth_user.name }}">
+                                {% else %}
+                                <input type="hidden" name="phone" value="">
+                                <input type="hidden" name="name" value="">
                                 {% endif %}
                                 <input type="hidden" name="id_journey" value="{{ row.id_journey }}">
                                 <input type="hidden" name="bus_name" value="{{ row.bus_name }}">

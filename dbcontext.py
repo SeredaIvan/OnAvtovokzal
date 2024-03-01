@@ -11,27 +11,33 @@ class DbContext:
         self.conn = pyodbc.connect("DRIVER={ODBC Driver 17 for SQL Server};SERVER=DESKTOP-TSMTSMN;DATABASE=avtovokzal;Trusted_Connection=yes")
         self.cursor = self.conn.cursor()
 
-    def get_items(self, other_class_instance,newquery=""):
+    def get_items(self, other_class_instance, newquery=""):
         array_items = list(other_class_instance.__dict__.keys())
         table = other_class_instance.__class__.__name__
         query = f"SELECT {', '.join(array_items)} FROM {table}"
 
-        if newquery!="":
-            query=newquery
-            print(query)
-        self.cursor.execute(query)
-        rows = self.cursor.fetchall()
-        result = []
-        print(query)
-        for row in rows:
-            instance = other_class_instance.__class__()
-            for idx, item in enumerate(array_items):
-                value = row[idx]
-                print(value)
-                setattr(instance, item, value if value is not None else "")
-            result.append(instance)
-        print("Item Get succes")
-        return result
+        if newquery != "":
+            query = newquery
+
+        try:
+            self.cursor.execute(query)
+            rows = self.cursor.fetchall()
+            result = []
+
+            if rows:
+                for row in rows:
+                    instance = other_class_instance.__class__()
+                    for idx, item in enumerate(array_items):
+                        value = row[idx]
+                        setattr(instance, item, value if value is not None else "")
+                    result.append(instance)
+                print("Item Get succes")
+                return result
+            else:
+                return None
+        except Exception as e:
+            print(f"Error executing SQL query: {e}")
+            return None
 
     def get_item_by_id(self, other_class_instance, item_id):
         array_items = list(other_class_instance.__dict__.keys())
@@ -47,37 +53,37 @@ class DbContext:
         self.cursor.execute(query, (item_id,))
 
         row = self.cursor.fetchone()
-
+        instance = None
         if row:
-            bus_instance = Buses()
+            instance = other_class_instance.__class__()
             for idx, item in enumerate(array_items):
                 value = row[idx]
-                print(value)
-                setattr(bus_instance, item, value if value is not None else "")
-            other_class_instance=bus_instance
+                setattr(instance, item, value if value is not None else None)
 
-        return other_class_instance
+        return instance
 
-    def add_item(self,obj):
-
-        db_context=DbContext()
+    def add_item(self, obj):
+        db_context = DbContext()
         db_context.select_last_index(obj)
 
         array_items = list(obj.__dict__.keys())
         non_id_items = [item for item in array_items if not item.startswith("id")]
-        values = ', '.join([f"'{obj.__dict__[item]}'" for item in non_id_items])
+
+        values = ', '.join(
+            [f"'{obj.__dict__[item]}'" if obj.__dict__[item] != None else "NULL" for item in non_id_items])
+
         query = f"INSERT INTO {obj.__class__.__name__} ({', '.join(non_id_items)}) VALUES ({values})"
+        print(query)
 
         try:
             self.cursor.execute(query)
             self.conn.commit()
+
             print(f"Item added successfully to {obj.__class__.__name__} table.")
             return True
         except Exception as e:
             print(f"Error adding item to {obj.__class__.__name__} table: {str(e)}")
             return False
-
-
 
     def select_last_index(self,obj):
         array_items = list(obj.__dict__.keys())
@@ -144,11 +150,19 @@ class DbContext:
             name_id='id_client'
         elif nametable=="Timetable":
             name_id='id_journey'
-        elif nametable != "Timetable":
-            tmp = nametable.lower()
-            name_id = f"id_{tmp[:-1]}"
+        elif nametable == "Cities":
+            name_id = 'id_city'
+        elif nametable == "Non_autorized_users":
+            name_id = 'id_user'
+        elif nametable == "Non_autorized_users":
+            name_id = 'id_user'
+        elif nametable == "Orders":
+            name_id = 'id_order'
+        elif nametable == "Tickets":
+            name_id = 'id_ticket'
         else:
-            print("err on DBContext at 142 line")
+            print("Не підтримуємий клас")
+            print("err on DBContext at 158 line")
             return False
 
         query = f"UPDATE {nametable} SET {item}=? WHERE {name_id}=?"
@@ -176,8 +190,4 @@ class DbContext:
             print(f"Error deleting record: {e}")
 
 
-db_context=DbContext()
-tickets = list
-query=f"SELECT * FROM tickets WHERE tickets.id_journey Like 2"
-tickets=db_context.get_items(Tickets(),newquery=query)
-print(tickets[0].seat)
+

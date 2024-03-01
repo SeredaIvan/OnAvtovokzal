@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if title is not none %}
+        Succes
+    {% else %}
+        Failed
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <style>
+    #divcent {
+        margin-top: -50px;
+        margin-bottom: 50px;
+        margin-left: 30%;
+        margin-right: 30%;
+        background-color: #E9ECEF;
+        border: 3px solid #E9ECEF;
+        border-radius: 20px;
+        padding: 50px;
+        padding-top: 100px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    #divcent>p{
+        width: 100%;
+    }
+    </style>
+
+
+            {% if title is not none %}
+                <div id="divcent">
+                    <div class="text-center" ><h3>Куплений квиток</h3></div>
+                    <p>Ваше ім'я
+                        {% if non_auth_user is none %}
+                            {{ user.name }}
+                        {% else %}
+                            {{ non_auth_user.name }}
+                        {% endif %}
+                    </p>
+                    <p>Місце : {{ seat }}</p>
+                    <p>Місто відправлення : {{ start_city.name }}</p>
+                    <p>Місто прибуття : {{ finish_city.name }}</p>
+                    <p>Час відправлення : {{ journey.time_start }}</p>
+                    <p>Час прибуття : {{ journey.time_finish }}</p>
+                    <p>Автобус : {{ bus.name }}</p>
+                    <p>Номер автобуса : {{ bus.bus_number }}</p>
+                </div>
+            {% else %}
+                <div class="text-center" style="margin-top: 100px">
+                <h2>Failed payment</h2>
+
+            {% endif %}
+        <div class="text-center">
+            <a class="btn btn-primary" href="/formbuyticket">Вибрати новий шлях</a>
+            <a class="btn btn-primary" href="/home">На головну</a>
+        </div>
+    </div>
+{% endblock %}

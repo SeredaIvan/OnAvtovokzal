@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}
+    Оплата
+{% endblock %}
+{% block body %}
+    <style>
+     div.main{
+         display: inline-block;
+         width: 100%;
+     }
+    </style>
+    <div class="main text-center" style="margin-top: 100px">
+        <h2>Інформація</h2>
+        <div class="bd-example-snippet bd-code-snippet">
+        <div class="bd-example m-0 border-0" style="margin-top: 50px !important;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Місце</th>
+                        <th scope="col">Місто відправлення</th>
+                        <th scope="col">Місто прибуття</th>
+                        <th scope="col">Час відправлення</th>
+                        <th scope="col">Час прибуття</th>
+                        <th scope="col">Номер автобуса</th>
+                        <th scope="col">Автобус</th>
+                        <th scope="col">Ціна</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ seat }}</td>
+                        <td>{{ bus.name }}</td>
+                        <td>{{ start_city.name }}</td>
+                        <td>{{ finish_city.name }}</td>
+                        <td>{{ journey.time_start }}</td>
+                        <td>{{ journey.time_finish }}</td>
+                        <td>{{ bus.bus_number }}</td>
+                        <td>{{ journey.cost }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <form method="post" action="/succesorder/">
+                {% if non_auth_user is not none %}
+                    <input type="hidden" name="phone" value="{{ non_auth_user.phone }}">
+                    <input type="hidden" name="name" value="{{ non_auth_user.name }}">
+                {% endif %}
+                <input type="hidden" name="id_journey" value="{{ journey.id_journey}}">
+                <input type="hidden" name="seat" value="{{ seat }}">
+                <button type="submit"> Купити </button>
+            </form>
+
+
+        </div>
+        </div>
+    </div>
+{% endblock %}
