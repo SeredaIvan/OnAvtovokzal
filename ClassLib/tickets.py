@@ -8,3 +8,4 @@ class Tickets:
         self.non_autorized_users_id = None
         self.client_id = None
         self.order_id = None
+        self.code=None

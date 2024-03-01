@@ -2,13 +2,13 @@
 <html lang="en">
 <script>
     function selectDiv(div) {
-    var seatNumber = div.getAttribute('data-seat'); // Отримуємо номер місця
+    var seatNumber = div.getAttribute('data-seat');
 
-    // Запис номеру місця у поле input
+
     var seatInput = document.querySelector('input[name="seat"]');
     seatInput.value = seatNumber;
 
-    // Зміна кольору обраних та невибраних місць
+
     var busDivs = document.querySelectorAll('.bus > div');
     busDivs.forEach(function (element) {
         if (element.getAttribute('data-seat') === seatNumber) {
@@ -42,22 +42,22 @@
         top: 0;
         left: 0;
         width: 100%;
-        background-color: #343a40; /* Choose your desired background color */
-        z-index: 1000; /* Set a higher z-index to ensure it stays on top */
+        background-color: #343a40;
+        z-index: 1000;
     }
 
-    /* Add some padding to the body to prevent content from being hidden under the fixed header */
+
     body {
-        padding-top: 70px; /* Adjust the padding-top value based on your header's height */
+        padding-top: 70px;
     }
     @media (max-width: 1000px) {
         body {
-            padding-top: 150px; /* Adjust the padding-top value for smaller screens */
+            padding-top: 150px;
         }
     }
     @media (max-width: 768px) {
         body {
-            padding-top: 200px; /* Adjust the padding-top value for smaller screens */
+            padding-top: 200px;
         }
     }
 </style>
@@ -75,16 +75,24 @@
           <li><a href="/About" class="nav-link px-2 text-white">Про нас</a></li>
         </ul>
 
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-           <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('search').addEventListener('focus', function() {
-                    this.value = "";
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="POST" action="/getticket">
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('search').addEventListener('focus', function() {
+                        this.value = "";
+                    });
                 });
-            });
-           </script>
-           <input type="search" id="search" class="form-control form-control-dark text-bg-dark" value="Напишіть код квитка...">
+                function checkTicketId() {
+                    var searchInput = document.getElementById('search');
+                    var ticketId = searchInput.value.trim();
+                    if (ticketId.length === 8 && !isNaN(ticketId)) {
+                        searchInput.closest('form').submit();
+                    }
+                }
+            </script>
+            <input type="search" id="search" name="ticket_id" class="form-control form-control-dark text-bg-dark" value="Напишіть код квитка..." onkeyup="checkTicketId()">
         </form>
+
           {% if user is not none %}
         <div class="text-end authorizationcompleted" style="margin-right:-50px ">
             <a href="/accountview"> <img src="{{ url_for('static', filename='svgs/profile.svg') }}" alt="Profile SVG" width="64px" height="64px"></a>
@@ -96,9 +104,6 @@
           <button type="button" class="btn btn-primary" onclick="redirectToRegister()">Зареєструватися</button>
         </div>
           {% endif %}
-
-
-
         <script>
             function redirectToLogin() {
                 window.location.href = "/loginselect";

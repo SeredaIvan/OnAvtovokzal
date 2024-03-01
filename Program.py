@@ -10,6 +10,7 @@ from ClassLib.orders import Orders
 from ClassLib.journeystable import JourneysTable
 from ClassLib.non_autorized_users import Non_autorized_users
 from datetime import datetime
+import random
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -192,6 +193,7 @@ def succesorder():
                 newticket.order_id = order.id_order
                 newticket.client_id = order.client_id
                 newticket.date_buying = datetime.strptime(str(datetime.utcnow().replace(microsecond=0)), '%Y-%m-%d %H:%M:%S')
+                newticket.code=GenerateRandomNumber()
                 if non_auth_user is None:
                     newticket.client_id = user.id_client
                 else:
@@ -219,6 +221,34 @@ def succesorder():
             return redirect('/formbuyticket')
     return render_template('succesorder.html', title=None)
 
+@app.route("/getticket",methods=["POST"])
+def getticket():
+    if request.form.get('ticket_id'):
+        ticket_id=request.form.get('ticket_id')
+        ticket=Tickets()
+        if db_context.get_item_by_other_value(ticket,'code',ticket_id):
+            ticket=db_context.get_item_by_other_value(ticket,'code',ticket_id)
+            journey=Timetable()
+            journey=db_context.get_item_by_id(journey,ticket.journey_id)
+            start_city = Cities()
+            finish_city = Cities()
+            start_city = db_context.get_item_by_id(start_city, journey.city_start_id)
+            finish_city = db_context.get_item_by_id(finish_city, journey.city_finish_id)
+            bus=Buses()
+            bus=db_context.get_item_by_id(bus,ticket.bus_id)
+            if ticket.client_id is not None:
+                user=Clients()
+                user=db_context.get_item_by_id(user,ticket.client_id)
+                nonuser=None
+            else:
+                nonuser = Non_autorized_users()
+                nonuser = db_context.get_item_by_id(nonuser, ticket.non_autorized_users_id)
+                user=None
+            return render_template('succesorder.html', title="Succes", user=user, non_auth_user=nonuser,
+                                   start_city=start_city, finish_city=finish_city, journey=journey, bus=bus, seat=ticket.seat,
+                                   ticket=ticket)
+        else:
+            return redirect('/home')
 
 @app.route('/journeys', methods=['GET','POST'])
 def journeys():
@@ -577,6 +607,8 @@ def AddToDict(user=Clients()):
     user_dict = user.to_dict()
     session['user'] = user_dict
 
+def GenerateRandomNumber():
+    return ''.join(random.choices('0123456789', k=8))
 
 def GetFromDict():
     if session.get('user', {}):

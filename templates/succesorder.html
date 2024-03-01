@@ -26,11 +26,23 @@
         width: 100%;
     }
     </style>
-
+    <script>
+    function copyText() {
+            var text = document.getElementById("textToCopy").innerText;
+            navigator.clipboard.writeText(text)
+                .then(function() {
+                    alert("Текст успішно скопійовано!");
+                })
+                .catch(function(error) {
+                    console.error("Не вдалося скопіювати текст: ", error);
+                });
+        }
+    </script>
 
             {% if title is not none %}
                 <div id="divcent">
                     <div class="text-center" ><h3>Куплений квиток</h3></div>
+                    <p id="textToCopy" >Номер квитка {{ ticket.code }}   <a onclick="copyText()"><span style="font-size: 12px; color: grey;cursor:pointer ; ">Копіювати</span></a></p>
                     <p>Ваше ім'я
                         {% if non_auth_user is none %}
                             {{ user.name }}
