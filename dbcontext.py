@@ -18,7 +18,7 @@ class DbContext:
 
         if newquery != "":
             query = newquery
-
+        print(query)
         try:
             self.cursor.execute(query)
             rows = self.cursor.fetchall()
@@ -119,6 +119,33 @@ class DbContext:
             return new_instance
 
         return None
+
+    def get_items_by_other_value(self, other_class_instance, item, value):
+        try:
+            array_items = list(other_class_instance.__dict__.keys())
+            table = other_class_instance.__class__.__name__
+
+            query = f"SELECT * FROM {table} WHERE {item} = ?"
+            self.cursor.execute(query, (value,))
+
+            rows = self.cursor.fetchall()
+
+            result = []
+            if rows:
+                for row in rows:
+                    instance = other_class_instance.__class__()
+                    for idx, item_name in enumerate(array_items):
+                        item_value = row[idx]
+                        print(item_value)
+                        setattr(instance, item_name, item_value if item_value is not None else "")
+                    result.append(instance)
+                print("Items retrieved successfully")
+                return result
+            else:
+                return None
+        except Exception as e:
+            print(f"Error executing SQL query: {e}")
+            return None
 
     def get_user(self, password, item, value):
         query = f"SELECT * FROM clients WHERE {str(item)} = ?"

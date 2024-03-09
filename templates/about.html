@@ -6,5 +6,49 @@
 
 {% block body %}
 
-<h1>Про нас</h1>
+<div class="b-example-divider"></div>
+
+<div class="p-5 text-center bg-body-secondary">
+<div class="container px-4 py-5 " id="hanging-icons">
+    <h2 class="pb-2 border-bottom">Про нас:</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-4">
+      <div class="col d-flex align-items-start">
+        <div style="" class="icon-square text-body-emphasis y d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Розклад автобусів</h3>
+          <p>Переглядайте актуальний розклад руху автобусів, обирайте зручний час відправлення та призначення.</p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/distance.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Пошук маршрутів</h3>
+          <p>Знаходьте оптимальні маршрути між містами та вибирайте найзручніші варіанти подорожі.</p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/ticket.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Квитки онлайн</h3>
+          <p> Бронюйте та оплачуйте квитки прямо на сайті, уникайте черг та забезпечте собі місце в потрібному вам автобусі.</p>
+        </div>
+      </div>
+        <div class="col d-flex align-items-start">
+        <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+          <img  src="{{ url_for('static', filename='svgs/info.svg') }}" alt="Profile SVG" width="52px" height="52px">
+        </div>
+        <div>
+          <h3 class="fs-3 text-body-emphasis">Інформація про автобуси</h3>
+          <p>Детальна інформація про автобуси, включаючи кількість місць, номер автобуса та інше.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

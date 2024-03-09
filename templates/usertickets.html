@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Мої квитки
+{% endblock %}
+
+{% block body %}
+    <style>
+        #flexmain {
+            margin-top: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        #flexmain>div {
+            background-color: #E9ECEF;
+            border-radius: 25px;
+            box-shadow: 5px 5px black;
+            padding: 35px;
+            margin-left: 20px;
+            margin-top: 20px;
+        }
+
+        #flexmain>div:hover {
+            background-color: #cfd0d1;
+            border-radius: 25px;
+            box-shadow: 6px 5px #0D6EFD;
+        }
+
+        #flexmain>div>* {
+            margin-top: 10px;
+        }
+    </style>
+    <div id="flexmain">
+
+        {% for cardticket in recenttickets %}
+            <div>
+                <p>Код поїздки</p><p>{{ cardticket.code }}</p>
+                <p>Напрямок</p><p><strong>{{ cardticket.name }}</strong></p>
+                <p>Час</p><p><strong>{{ cardticket.time }}</strong></p>
+                <p>Вартість</p><p><strong>{{ cardticket.cost }}</strong></p>
+
+                <form action="/getticket" method="post">
+                    <input type="hidden" name="ticket_id" value="{{ cardticket.id_ticket }}">
+                    <button type="submit" class="btn btn-primary">Дивитись деталі</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="flexmain">
+        {% for cardticket in oldtickets %}
+            <div style="background-color: #212529;color: white">
+                <p style="color: red;text-shadow: 1px 1px 1px white;">Дія білету завершилась</p>
+                <p>Код поїздки</p><p>{{ cardticket.code }}</p>
+                <p>Напрямок</p><p><strong>{{ cardticket.name }}</strong></p>
+                <p>Час</p><p><strong>{{ cardticket.time }}</strong></p>
+                <p>Вартість</p><p><strong>{{ cardticket.cost }}</strong></p>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

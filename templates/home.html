@@ -5,47 +5,9 @@
 {% endblock %}
 
 {% block body %}
-    <script>
-        async function redirectSelect() {
-            try {
-                let cityfinish = null;
-                let citystart = null;
-                const cityFinishInput = document.querySelector('input[name="cityfinish"]');
-                const cityStartInput = document.querySelector('input[name="citystart"]');
-                if (cityFinishInput && cityFinishInput.value) {
-                    cityfinish = cityFinishInput.value;
-                }
-                if (cityStartInput && cityStartInput.value) {
-                    citystart = cityStartInput.value;
-                }
-                // Construct the URL with the updated format
-                const url = `/journeys?citystart=${encodeURIComponent(citystart)}&cityfinish=${encodeURIComponent(cityfinish)}`;
-                const response = await fetch(url);
-                if (response.ok) {
-                    // Reload the page after a successful GET request
-                    window.location.href = url;
-                } else {
-                    console.error('Error sending GET request');
-                }
-            } catch (error) {
-                console.error('Error executing fetch:', error);
-            }
-    }
-    </script>
-
     <div class="b-example-divider"></div>
     <div class="b-example-divider"></div>
 
-    <div class="my-5 ">
-        <form class="form-control bg-body-secondary" action="/journeys" method="GET">
-            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-                <div class="col d-flex align-items-start"><input name="citystart"  class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
-                <div class="col d-flex align-items-start"><input name="cityfinish" class="form-control" type="text" placeholder="Введіть місто відправлення..."></div>
-                <div class="col d-flex align-items-start"><button class="btn btn-primary" type="submit" onclick="redirectToSelect()">Дивитись подорожі</button></div>
-            </div>
-        </form>
-    </div>
-    <div class="my-5">
   <div class="p-5 text-center bg-body-secondary">
     <div class="container py-5">
       <h1 class="text-body-emphasis">Ласкаво просимо на "OnAvtovokzal" – ваш онлайн автовокзал!</h1>
@@ -68,43 +30,43 @@
         <div>
           <h3 class="fs-3 text-body-emphasis">Розклад автобусів</h3>
           <p>Переглядайте актуальний розклад руху автобусів, обирайте зручний час відправлення та призначення.</p>
-          <a href="#" class="btn btn-primary">
-            Primary button
+          <a href="/journeys" class="btn btn-primary">
+            Переглянути розклад
           </a>
         </div>
       </div>
       <div class="col d-flex align-items-start">
         <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+          <img  src="{{ url_for('static', filename='svgs/distance.svg') }}" alt="Profile SVG" width="52px" height="52px">
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">Пошук маршрутів</h3>
           <p>Знаходьте оптимальні маршрути між містами та вибирайте найзручніші варіанти подорожі.</p>
-          <a href="#" class="btn btn-primary">
-            Primary button
+          <a href="/formbuyticket" class="btn btn-primary">
+            Знайти
           </a>
         </div>
       </div>
       <div class="col d-flex align-items-start">
         <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+          <img  src="{{ url_for('static', filename='svgs/ticket.svg') }}" alt="Profile SVG" width="52px" height="52px">
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">Квитки онлайн</h3>
           <p> Бронюйте та оплачуйте квитки прямо на сайті, уникайте черг та забезпечте собі місце в потрібному вам автобусі.</p>
-          <a href="#" class="btn btn-primary">
-            Primary button
+          <a href="/formbuyticket" class="btn btn-primary">
+            Забронювати
           </a>
         </div>
       </div>
         <div class="col d-flex align-items-start">
         <div class="icon-square text-body-emphasis  d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-          <img  src="{{ url_for('static', filename='svgs/bus_schedule_icon.svg') }}" alt="Profile SVG" width="52px" height="52px">
+          <img  src="{{ url_for('static', filename='svgs/info.svg') }}" alt="Profile SVG" width="52px" height="52px">
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">Інформація про автобуси</h3>
           <p>Детальна інформація про автобуси, включаючи кількість місць, номер автобуса та інше.</p>
-          <a href="#" class="" style="">
+          <a href="/journeys" class="btn btn-primary" style="">
             Дізнатись інформацію
           </a>
         </div>

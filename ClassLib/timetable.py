@@ -10,6 +10,8 @@ class Timetable:
         self.time_start = None
         self.time_finish = None
         self.seats_occupied=None
+        self.is_active=None
+
 
     def getBusId(self):
        return self.id_journey

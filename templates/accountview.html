@@ -6,12 +6,38 @@
 
 
 {% block body %}
-    <h1>Акаунт користувача</h1>
-    <h2>ПІБ</h2>
-    <h2><strong>{{ user.name }}</strong></h2>
-    <h2>Email</h2>
-    <h2><strong>{{ user.email }} </strong></h2>
-    <h2>Телефон</h2>
-    <h2><strong>{{ user.phone }}</strong></h2>
-    <a href="usertickets">Мої квитки</a>
+    <style>
+    #acc{
+        padding: 5%;
+    }
+    #acc>div{
+        margin-top: 25px;
+    }
+    #acc>a{
+       margin-top: 25px;
+    }
+    span{
+        font-size: 14px;
+    }
+
+    </style>
+    <div id="acc" class="bg-body-secondary" >
+        <div class="text-center" style="display: inline-block">
+            <h1>Акаунт користувача</h1>
+        </div><br>
+        <div>
+            <span>ПІБ</span>
+            <span><strong>{{ user.name }}</strong></span><br>
+        </div>
+        <div>
+            <span>Email</span>
+            <span><strong>{{ user.email }} </strong></span><br>
+        </div>
+        <div>
+            <span>Телефон</span>
+            <span><strong>{{ user.phone }}</strong></span><br>
+        </div>
+        <a class="btn btn-primary" href="/usertickets">Мої квитки</a>
+        <a class="btn btn-primary" href="/exit">Вийти</a>
+    </div>
 {% endblock %}

@@ -9,8 +9,10 @@ from ClassLib.timetable import Timetable
 from ClassLib.orders import Orders
 from ClassLib.journeystable import JourneysTable
 from ClassLib.non_autorized_users import Non_autorized_users
+from ClassLib.cardticket import CardTicket
 from datetime import datetime
 import random
+import time
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -76,41 +78,53 @@ def tablejourneys():
 @app.route('/selectplace/', methods=['POST'])
 def selectplace():
     if request.method == "POST":
+        print('POST')
         non_auth_user = None
         if request.form.get('phone') and request.form.get('name'):
             non_auth_user = Non_autorized_users()
             non_auth_user.phone = request.form.get('phone')
             non_auth_user.name = request.form.get('name')
         id_journey = request.form.get('id_journey')
-        bus_name = request.form.get('bus_name')
+        bus_name = request.form.get('bus_name').strip()
         start_city = request.form.get('start_city')
         finish_city = request.form.get('finish_city')
-        bus=Buses()
-        bus = db_context.get_item_by_other_value(bus,'name',bus_name)
-        journey=Timetable()
-        journey=db_context.get_item_by_id(journey,id_journey)
-        tickets=None
-        query=f"SELECT * FROM tickets WHERE tickets.journey_id Like {id_journey}"
-        if db_context.get_items(Tickets(),newquery=query)is not None:
-            tickets=db_context.get_items(Tickets(),newquery=query)
-        countstickets=0
-        greyseats=None
+        print("name" + bus_name)
+        selected_bus = Buses()  # Змінилася назва змінної bus на selected_bus
+        selected_bus = db_context.get_item_by_other_value(selected_bus, 'name', bus_name)
+        print("seat"+str(selected_bus.seats))
+        print("name"+str(selected_bus.name))
+        print("bus_number"+str(selected_bus.bus_number))
+
+        journey = Timetable()
+        journey = db_context.get_item_by_id(journey, id_journey)
+        tickets = None
+        query = f"SELECT * FROM tickets WHERE tickets.journey_id Like {id_journey}"
+        if db_context.get_items(Tickets(), newquery=query) is not None:
+            tickets = db_context.get_items(Tickets(), newquery=query)
+        countstickets = 0
+        greyseats = None
         if tickets is not None:
-            countstickets=len(tickets)
-            greyseats=[]
+            countstickets = len(tickets)
+            greyseats = []
             for ticket in tickets:
-                for seat in range(bus.seats):
+                for seat in range(selected_bus.seats):  # Використовується selected_bus замість bus
                     if ticket.seat == seat:
                         greyseats.append(seat)
 
         if non_auth_user is not None:
-            return render_template("selectplace.html",user=GetFromDict(), non_auth_user=non_auth_user, bus=bus, journey = journey,
-                               start_city=start_city, finish_city=finish_city, tickets=tickets,countstickets=countstickets,greyseats=greyseats)
+            return render_template("selectplace.html", user=GetFromDict(), non_auth_user=non_auth_user,
+                                   bus=selected_bus,
+                                   journey=journey,
+                                   start_city=start_city, finish_city=finish_city, tickets=tickets,
+                                   countstickets=countstickets, greyseats=greyseats)
         else:
-            return render_template("selectplace.html",user=GetFromDict(), non_auth_user=None, bus=bus, journey = journey,
-                               start_city=start_city, finish_city=finish_city, tickets=tickets,countstickets=countstickets,greyseats=greyseats)
+            return render_template("selectplace.html", user=GetFromDict(), non_auth_user=None, bus=selected_bus,
+                                   journey=journey,
+                                   start_city=start_city, finish_city=finish_city, tickets=tickets,
+                                   countstickets=countstickets, greyseats=greyseats)
 
     return redirect('/formbuyticket')
+
 
 @app.route('/pay/', methods=['POST', 'GET'])
 def pay():
@@ -252,12 +266,20 @@ def getticket():
 
 @app.route('/journeys', methods=['GET','POST'])
 def journeys():
+    for req in request.args:
+        print(request.args[req])
+        print('DA')
+
     try:
         if ((request.args.get('item_sort') and request.args.get('direction') and request.args.get('citystart')) or
                 (request.args.get('citystart') and request.args.get('cityfinish')) or
                 (request.args.get('item_sort') and request.args.get('direction') and request.args.get('citystart')and request.args.get('cityfinish'))):
-            item_sort = request.args.get('item_sort')
-            direction = request.args.get('direction')
+            item_sort=""
+            direction=""
+            if request.args.get('item_sort'):
+                item_sort = request.args.get('item_sort')
+            if request.args.get('direction'):
+                direction = request.args.get('direction')
             query = (
                 f"SELECT timetable.id_journey,buses.name AS bus_name, start_city.name AS start_city, finish_city.name AS finish_city, timetable.time_start, timetable.time_finish,timetable.cost FROM timetable "
                 f"JOIN cities AS start_city ON timetable.city_start_id = start_city.id_city "
@@ -310,8 +332,8 @@ def journeys():
     buses = db_context.get_items(Buses())
     journeys = db_context.get_items(Timetable())
     cities = db_context.get_items(Cities())
-    return render_template("journeys.html", user=GetFromDict(), buses=buses, journeys=journeys, cities=cities, table=None)
-
+    return render_template("journeys.html", user=GetFromDict(), buses=buses, journeys=journeys, cities=cities,
+                           table=None)
 
 @app.route('/')
 def firstroute():
@@ -387,11 +409,66 @@ def register():
     if request.method == "GET":
         return render_template("register.html",user=None,info=None)
 
-
 @app.route('/accountview')
 def accountview():
-    if GetFromDict() is not None:
-        return render_template("accountview.html", user=GetFromDict())
+    user = GetFromDict()
+    if user:
+        return render_template("accountview.html", user=user)
+    else:
+        return redirect("/home")
+
+
+@app.route('/exit')
+def exit():
+    DeleteFromDict()
+    return redirect('/home');
+
+@app.route('/usertickets')
+def usertickets():
+    user = GetFromDict()
+    if user:
+        user = db_context.get_item_by_other_value(user, 'email', user.email)
+        tickets = db_context.get_items_by_other_value(Tickets(), 'client_id', user.id_client)
+
+        oldtickets = []
+        recenttickets = []
+        journeys=[]
+
+        if tickets is not None:
+            for ticket in tickets:
+                card=CardTicket()
+
+                journeyy = Timetable()
+                journeyy = db_context.get_item_by_id(journeyy, ticket.journey_id)
+                journeys.append(journeyy)
+
+                card.id_ticket=ticket.id_ticket
+                card.code=ticket.code
+                card.cost=journeyy.cost
+
+                str_time=str(journeyy.time_start)+str(journeyy.time_finish)
+                card.time=str_time
+
+                for journey in journeys:
+                    city_start=Cities()
+                    city_finish=Cities()
+                    city_start=db_context.get_item_by_id(city_start,journey.city_start_id)
+                    city_finish=db_context.get_item_by_id(city_finish,journey.city_finish_id)
+                    str_city=str(city_start.name)+" - " + str(city_finish.name)
+
+                    card.name=str_city
+
+                    current_time = datetime.utcnow().replace(microsecond=0)
+                    if ticket.journey_id==journey.id_journey:
+                        if journey.time_finish < current_time:
+                            oldtickets.append(card)
+                        else:
+                            recenttickets.append(card)
+
+
+            return render_template("usertickets.html", user=user, oldtickets=oldtickets, recenttickets=recenttickets)
+        else:
+            return render_template("usertickets.html", user=user, oldtickets=oldtickets, recenttickets=recenttickets)
     else:
         return redirect("/home")
 
@@ -403,7 +480,7 @@ def addbus():
             return render_template("addbus.html", info=None)
         else:
             return redirect("/home")
-    if request.method=="POST":
+    if request.method == "POST":
         bus=Buses()
         bus.name=str(request.form['nameBus'])
         bus.seats=str(request.form['seats'])
@@ -412,6 +489,7 @@ def addbus():
             return render_template("addbus.html", info=None)
         else:
             return render_template("addbus.html", info="Не додано")
+
 
 @app.route('/addcity', methods=['POST','GET'])
 def addcity():
@@ -603,9 +681,7 @@ def GetClassFields(obj):
      return list(obj.__dict__.keys())
 
 
-def AddToDict(user=Clients()):
-    user_dict = user.to_dict()
-    session['user'] = user_dict
+
 
 def GenerateRandomNumber():
     return ''.join(random.choices('0123456789', k=8))
@@ -618,11 +694,27 @@ def GetFromDict():
     else:
         return None
 
+def AddToDict(user=Clients()):
+    user_dict = user.to_dict()
+    session['user'] = user_dict
 
 def DeleteFromDict():
     if 'user' in session:
         del session['user']
-        AddToDict()
+
+def IsActive(journeys):
+    newjourneys = []
+    for journey in journeys:
+        if journey.is_active == 1:
+            newjourneys.append(journey)
+    if len(newjourneys) > 0:
+        return newjourneys
+    else:
+        return None
+
+def parse_date(s):
+    date, millis = s.rsplit(":", 1)
+    return time.mktime(time.strptime(date, "%Y-%m-%d %H:%M:%S")) + int(millis) / 1000.0
 
 
 if __name__ == "__main__":

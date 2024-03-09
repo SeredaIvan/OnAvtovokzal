@@ -46,7 +46,7 @@
 </script>-->
     <script>
     function submitForm(index) {
-        let nameForm="buyTicketForm"+ ind.toString()
+        let nameForm="buyTicketForm"+ index.toString()
         //if starttime
         document.getElementById('buyTicketForm').submit();
     }
@@ -89,7 +89,6 @@
             });
 
             if (response.ok) {
-                // Перезавантаження сторінки після успішної відправки POST-запиту
                 window.location.href='/journeys';
                 window.location.reload();
             } else {
@@ -213,18 +212,25 @@
                         <td>{{ journey.cost }}</td>
                         <td>
                             {% if user is not none %}
-                            <a class="btn btn-primary" onclick="submitForm({{ loop.index }})">Купити</a>
+                            <form action="/selectplace/" method="post" >
+                                <input type="hidden" name="id_journey" value="{{ journey.id_journey }}">
+                                <input type="hidden" name="bus_name" value="{% for bus in buses %}
+                                    {% if bus.id_bus == journey.bus_id %}
+                                        {{ bus.name }}
+
+                                    {% endif %}
+                                {% endfor %}">
+                                <input type="hidden" name="citystart" value="{{ citystart }}">
+                                <input type="hidden" name="cityfinish" value="{{ cityfinish }}">
+                                <button type="submit" class="btn btn-primary" >Купити</button>
+                            </form>
+
                             {% endif %}
                             {% if user is none %}
                             <a class="btn btn-primary" href="/loginselect">Ввійти</a>
                             {% endif %}
 
-                            <form id="buyTicketForm{{ loop.index }}" action="" method="post" style="display: none;">
-                                <input type="hidden" name="citystart" value="{{ citystart }}">
-                                <input type="hidden" name="cityfinish" value="{{ cityfinish }}">
-                                <input type="hidden" name="starttime" value="">
-                                <input type="hidden" name="finishtime" value="">
-                            </form>
+
 
 
                         </td>
@@ -272,7 +278,14 @@
                         <td>{{ tab.cost }}</td>
                         <td>
                             {% if user is not none %}
-                            <a class="btn btn-primary" onclick="">Купити</a>
+                                <form action="/selectplace/" method="post">
+                                    <input type="hidden" name="id_journey" value="{{ tab.id_journey }}">
+                                    <input type="hidden" name="bus_name" value="{{ tab.bus_name }}">
+                                    <input type="hidden" name="start_city" value="{{ tab.start_city }}">
+                                    <input type="hidden" name="finish_city" value="{{ tab.finish_city }}">
+                                    <button type="submit" class="btn btn-primary" >Купити</button>
+                                </form>
+
                             {% endif %}
                             {% if user is none %}
                             <a class="btn btn-primary" href="/loginselect">Ввійти</a>
