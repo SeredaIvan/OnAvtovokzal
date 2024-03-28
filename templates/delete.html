@@ -1,7 +1,7 @@
 {% extends 'baseadmin.html' %}
 
 {% block title %}
-Update
+Видалити
 {% endblock %}
 
 
@@ -31,7 +31,7 @@ Update
     <form method="post">
     <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
         <div class="list-group list-group-checkable d-grid gap-2 border-0">
-            <h2>Виберіть що хочете оновити</h2>
+            <h2>Виберіть що хочете видалити</h2>
         <input  style="display: none;" class="list-group-item-check pe-none " type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios1" value="bus" checked="">
         <label class="list-group-item rounded-3 py-3 active" for="listGroupCheckableRadios1">
             Автобус
@@ -48,8 +48,12 @@ Update
         <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios4">
             Квиток
         </label>
+        <input style="display: none;" class="list-group-item-check pe-none" type="radio" name="listGroupCheckableRadios" id="listGroupCheckableRadios5" value="client">
+        <label class="list-group-item rounded-3 py-3" for="listGroupCheckableRadios5">
+            Клієнт
+        </label>
         </div>
-        <button type="submit" class="btn btn-primary">Оновити</button>
+        <button type="submit" class="btn btn-primary">Видалити</button>
         <a href="/adminpanel" class="btn btn-primary">Назад</a>
     </div>
     </form>

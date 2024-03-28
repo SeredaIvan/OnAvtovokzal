@@ -32,23 +32,24 @@
             margin-top: 10px;
         }
     </style>
+    {% if recenttickets is not none %}
     <div id="flexmain">
-
         {% for cardticket in recenttickets %}
             <div>
                 <p>Код поїздки</p><p>{{ cardticket.code }}</p>
                 <p>Напрямок</p><p><strong>{{ cardticket.name }}</strong></p>
-                <p>Час</p><p><strong>{{ cardticket.time }}</strong></p>
+                <p>Час поїздки</p><p><strong>{{ cardticket.time }}</strong></p>
                 <p>Вартість</p><p><strong>{{ cardticket.cost }}</strong></p>
 
                 <form action="/getticket" method="post">
-                    <input type="hidden" name="ticket_id" value="{{ cardticket.id_ticket }}">
+                    <input type="hidden" name="ticket_id" value="{{ cardticket.code }}">
                     <button type="submit" class="btn btn-primary">Дивитись деталі</button>
                 </form>
             </div>
         {% endfor %}
     </div>
-
+    {% endif %}
+    {% if oldtickets is not none %}
     <div id="flexmain">
         {% for cardticket in oldtickets %}
             <div style="background-color: #212529;color: white">
@@ -60,5 +61,10 @@
             </div>
         {% endfor %}
     </div>
+        {% else %}
+        <div style="margin-top: 100px" class="text-center">
+        <h3>Квитків не знайдено</h3><br>
+        </div>
+    {% endif %}
 
 {% endblock %}

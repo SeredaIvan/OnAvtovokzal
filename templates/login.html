@@ -11,8 +11,17 @@
            alert("Не вірний пароль")
         </script>
     {% endif %}
+<style>
+    div.form-floating>input{
+        margin-bottom: 5px;
+
+    }
+    form.my>button {
+        margin-top: 10px;
+    }
+</style>
 <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
-  <form class="text-center"  method="post">
+  <form class="text-center my"  method="post">
     <h1 class="h3 mb-3 fw-normal">Вхід</h1>
     {% if data == 'email' %}
     <div class="form-floating">

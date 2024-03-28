@@ -8,36 +8,46 @@
 {% block body %}
     <style>
     #acc{
-        padding: 5%;
+        padding-left: 5%;
     }
     #acc>div{
-        margin-top: 25px;
+        margin-top: 10px;
+        padding: 25px;
+        border-bottom: 3px solid black;
+        border-radius: 25px;
+        background: linear-gradient(to bottom,  #E9ECEF,white);
+        display: block;
+        width: 300px;
     }
     #acc>a{
        margin-top: 25px;
-    }
+    }S
     span{
         font-size: 14px;
     }
+    h3{
+        margin: 0;
+    }
 
     </style>
-    <div id="acc" class="bg-body-secondary" >
+    <div id="acc" class="bg-body-secondary " >
         <div class="text-center" style="display: inline-block">
             <h1>Акаунт користувача</h1>
         </div><br>
         <div>
-            <span>ПІБ</span>
-            <span><strong>{{ user.name }}</strong></span><br>
+            <h3>ПІБ</h3>
+            <h3><strong>{{ user.name }}</strong></h3><br>
         </div>
         <div>
-            <span>Email</span>
-            <span><strong>{{ user.email }} </strong></span><br>
+            <h3>Email</h3>
+            <h3><strong>{{ user.email }} </strong></h3><br>
         </div>
         <div>
-            <span>Телефон</span>
-            <span><strong>{{ user.phone }}</strong></span><br>
+            <h3>Телефон</h3>
+            <h3><strong>{{ user.phone }}</strong></h3><br>
         </div>
         <a class="btn btn-primary" href="/usertickets">Мої квитки</a>
         <a class="btn btn-primary" href="/exit">Вийти</a>
     </div>
+
 {% endblock %}

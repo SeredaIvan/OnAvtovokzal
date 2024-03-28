@@ -1,7 +1,7 @@
 {% extends 'baseadmin.html' %}
 
 {% block title %}
-    Оновити запис
+    Видалити запис
 {% endblock %}
 
 {% block body %}
@@ -44,7 +44,7 @@
                 newInput.type='text';
             }
             else if (fieldType==='datetime'){
-                newInput.type='datetime-local';
+                window.location.href="/home";
             }
             newInput.name = 'value';
             newInput.id = 'value';
@@ -69,10 +69,8 @@
 
     {% if info is none %}
         <form method="post">
-            <h2>Оновлення запису</h2>
-            <label for="id">Введіть id запису</label>
-            <input type="text" name="id" id="id" required>
-            <button type="submit">Оновити</button>
+            <h2>Видалення запису</h2>
+            <button type="submit">Видалити</button>
         </form>
 
     {% else %}

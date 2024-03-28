@@ -12,9 +12,17 @@
             alert(info)
         </script>
     {% endif %}
+<style>
+    div.form-floating>input{
+        margin-bottom: 5px;
 
+    }
+    form.my>button {
+        margin-top: 10px;
+    }
+</style>
 <div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary">
-  <form class="text-center" method="post">
+  <form  class="text-center my" method="post">
     <h1 class="h3 mb-3 fw-normal">Реєстрація</h1>
     <div class="form-floating">
       <input  type="text" class="form-control" id="floatingInputName" name="floatingInputName" placeholder="Ім'я" required>
