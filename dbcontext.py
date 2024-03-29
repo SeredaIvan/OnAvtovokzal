@@ -1,10 +1,5 @@
 import pyodbc
-from ClassLib.buses import Buses
 from ClassLib.clients import Clients
-from ClassLib.tickets import Tickets
-
-from ClassLib.timetable import Timetable
-
 
 class DbContext:
     def __init__(self):
@@ -159,7 +154,6 @@ class DbContext:
             print(str(user.id_client)+" "+user.name+" "+user.phone+" "+user.password+" "+user.email)
             if user.password == password:
                 print("User authorized")
-                print("Row values:", row)
                 return user
             else :
                 print("incorect password")
@@ -213,8 +207,10 @@ class DbContext:
             with self.conn:
                 with self.cursor.execute(query, values):
                     print(f"Delete successful from {nametable} where {item} = {value}.")
+                    return True
         except Exception as e:
             print(f"Error deleting record: {e}")
+            return False
 
 
 

@@ -427,12 +427,17 @@ def exit():
 def usertickets():
     user = GetFromDict()
     if user:
+        #потрібно дізнстись id user
         user = db_context.get_item_by_other_value(user, 'email', user.email)
-        tickets = db_context.get_items_by_other_value(Tickets(), 'client_id', user.id_client)
-
+        tickets=None
+        if db_context.get_items_by_other_value(Tickets(), 'client_id', user.id_client):
+            tickets = db_context.get_items_by_other_value(Tickets(), 'client_id', user.id_client)
+        if tickets is not None:
+            for ticket in tickets:
+                print(ticket.id_ticket)
         oldtickets = []
         recenttickets = []
-        journeys=[]
+
 
         if tickets is not None:
             for ticket in tickets:
@@ -440,14 +445,25 @@ def usertickets():
 
                 journeyy = Timetable()
                 journeyy = db_context.get_item_by_id(journeyy, ticket.journey_id)
+                journeys = []
                 journeys.append(journeyy)
 
                 card.id_ticket=ticket.id_ticket
                 card.code=ticket.code
                 card.cost=journeyy.cost
 
-                str_time=str(journeyy.time_start)+str(journeyy.time_finish)
-                card.time=str_time
+                time_start = str(journeyy.time_start)
+                time_finish = str(journeyy.time_finish)
+
+                time_start_obj = datetime.strptime(time_start, "%Y-%m-%d %H:%M:%S")
+                time_finish_obj = datetime.strptime(time_finish, "%Y-%m-%d %H:%M:%S")
+
+                formatted_time_start = time_start_obj.strftime("%d.%m.%Y %H:%M:%S")
+                formatted_time_finish = time_finish_obj.strftime("%d.%m.%Y %H:%M:%S")
+
+                str_time = f"{formatted_time_start} - {formatted_time_finish}"
+
+                card.time = str_time
 
                 for journey in journeys:
                     city_start=Cities()
@@ -455,20 +471,18 @@ def usertickets():
                     city_start=db_context.get_item_by_id(city_start,journey.city_start_id)
                     city_finish=db_context.get_item_by_id(city_finish,journey.city_finish_id)
                     str_city=str(city_start.name)+" - " + str(city_finish.name)
-
                     card.name=str_city
 
                     current_time = datetime.utcnow().replace(microsecond=0)
                     if ticket.journey_id==journey.id_journey:
-                        if journey.time_finish < current_time:
+                        if journey.time_start < current_time:
                             oldtickets.append(card)
                         else:
                             recenttickets.append(card)
 
-
             return render_template("usertickets.html", user=user, oldtickets=oldtickets, recenttickets=recenttickets)
         else:
-            return render_template("usertickets.html", user=user, oldtickets=oldtickets, recenttickets=recenttickets)
+            return render_template("usertickets.html", user=user, oldtickets=None, recenttickets=None)
     else:
         return redirect("/home")
 
@@ -556,20 +570,81 @@ def addadmin():
             return render_template("addadmin.html", info="Не додано")
 
 
-#@app.route('/killuser', methods=['POST', 'GET'])
-#def killuser():
-#    if request.method == "GET":
-#        if GetFromDict() is not None:
-#            return render_template("killuser.html", user=GetFromDict(), info=None)
-#        else:
-#            return redirect("/home")
-#
-#    if request.method == "POST":
-#
-#        if db_context.delete_item():
-#            return render_template("killuser.html", user=GetFromDict(), info=None)
-#        else:
-#            return render_template("killuser.html", user=GetFromDict(), info="Не додано")
+
+@app.route('/delete', methods=['POST','GET'])
+def delete():
+    if request.method == "GET":
+        if GetFromDict():
+            if GetFromDict().role_client == "admin":
+                return render_template("delete.html")
+        else:
+            return redirect("/home")
+    if request.method == "POST":
+        selected_radio = request.form.get('listGroupCheckableRadios')
+
+        if selected_radio == "bus":
+            bus = Buses()
+            fieldlist = GetClassFields(bus)
+            return render_template("deletewhatrecord.html", fieldlist=fieldlist, clas=bus)
+        elif selected_radio == "journey":
+            journey = Timetable()
+            fieldlist = GetClassFields(journey)
+            return render_template("deletewhatrecord.html", fieldlist=fieldlist, clas=journey)
+        elif selected_radio == "city":
+            city = Cities()
+            fieldlist = GetClassFields(city)
+            return render_template("deletewhatrecord.html", fieldlist=fieldlist, clas=city)
+        elif selected_radio == "ticket":
+            tick = Tickets()
+            fieldlist = GetClassFields(tick)
+            return render_template("deletewhatrecord.html", fieldlist=fieldlist, clas=tick)
+        elif selected_radio == "client":
+            client = Clients()
+            fieldlist = GetClassFields(client)
+            return render_template("deletewhatrecord.html", fieldlist=fieldlist, clas=client)
+
+        return redirect("/adminpanel")
+
+@app.route('/deletepost/<selectedfield>/<clas>', methods=['POST', 'GET'])
+def deletepost(selectedfield, clas):
+    if request.method == "GET":
+        if GetFromDict() is not None:
+            if GetFromDict().role_client == "admin":
+                ss = selectedfield
+                return render_template("deletepost.html", selectedfield=ss, clas=clas, info=None)
+        else:
+            return redirect("/home")
+
+    if request.method == "POST":
+        item = selectedfield
+        value = request.form['value']
+        type=request.form['type']
+
+        try:
+            obj_class = globals()[clas]
+            obj = obj_class()
+        except KeyError:
+            return render_template("deletepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Не вдалося знайти клас")
+        try:
+            if type == "datetime":
+                return render_template("deletepost.html", selectedfield=selectedfield, clas=clas,
+                                       info="За цим полем не можна видалити")
+        except ValueError:
+            return render_template("deletepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Помилка конвертації у формат дати/часу")
+        try:
+            if type == "int":
+                value = int(value)
+        except ValueError:
+            return render_template("deletepost.html", selectedfield=selectedfield, clas=clas,
+                                   info="Помилка конвертації у формат int")
+
+        if db_context.delete_item( obj, item, value):
+            return render_template("adminpanel.html")
+        else:
+            return render_template("deletepost.html", selectedfield=selectedfield, clas=clas, info="Не видалено")
+
 
 @app.route('/update', methods=['POST','GET'])
 def update():
@@ -681,8 +756,6 @@ def GetClassFields(obj):
      return list(obj.__dict__.keys())
 
 
-
-
 def GenerateRandomNumber():
     return ''.join(random.choices('0123456789', k=8))
 
@@ -701,21 +774,6 @@ def AddToDict(user=Clients()):
 def DeleteFromDict():
     if 'user' in session:
         del session['user']
-
-def IsActive(journeys):
-    newjourneys = []
-    for journey in journeys:
-        if journey.is_active == 1:
-            newjourneys.append(journey)
-    if len(newjourneys) > 0:
-        return newjourneys
-    else:
-        return None
-
-def parse_date(s):
-    date, millis = s.rsplit(":", 1)
-    return time.mktime(time.strptime(date, "%Y-%m-%d %H:%M:%S")) + int(millis) / 1000.0
-
 
 if __name__ == "__main__":
     app.run(debug=True)
